@@ -15,7 +15,7 @@ def one_to_many_arg(fn):
 #Game logic.
 def play_random_choice(words):
     answer, word = c(words)[:-1].split(",")
-    result = input("{0} : ".format(word))
+    result = raw_input("{0} : ".format(word))
     return result, answer
 
 def print_and_wait(delay, message):
@@ -55,13 +55,15 @@ def keyboard_interrupt(e):
     e.trap(KeyboardInterrupt)
     import os #FUCK
     os._exit(1)
-    
+
 def prepare_game(game_chain):
-    game_chain.addCallback(start_measuring)
-    game_chain.addCallbacks(play_and_pass_time, pass_exception)
-    game_chain.addCallbacks(stop_measuring, pass_exception)
-    game_chain.addCallbacks(prepare_react, pass_exception)
-    game_chain.addCallbacks(react_choice, keyboard_interrupt)
+    c1 = game_chain.addCallback
+    c2 = game_chain.addCallbacks
+    c1(start_measuring)
+    c2(play_and_pass_time, pass_exception)
+    c2(stop_measuring, pass_exception)
+    c2(prepare_react, pass_exception)
+    c2(react_choice, keyboard_interrupt)
     return game_chain
 
 def after_play_hook(data, result):
