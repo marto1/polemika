@@ -56,7 +56,6 @@ SELECTED = (128, 0, 100)
 UNSELECTED = (128,128,128)
 PROGRESS_TEXT = " "*60+"Time: {0}"
 DESIRED_FPS = 60.0
-STATE = 0 # 0: in session , 1: timeout, 2: won
 TIME = time(0, 1, 0)
 k = 100
 BAR_TICK = 100.0 / time_to_total_seconds(TIME)
@@ -137,6 +136,10 @@ def process_events(): #why polling? can't we use twisted for that?
             else: #assume text input
                 WORDS[selected_index]["guess"] += event.unicode
 
+def show_correct(words):
+    for word in words:
+        word["guess"] += " " + word["trans"]
+
 def countdown_remaining_time():
     global remaining_time
     global rem
@@ -148,6 +151,7 @@ def countdown_remaining_time():
         t_lb_surface.fill(TABLE_COLOR)
         rem.stop()
         task.deferLater(reactor, 2, reset_game)
+        show_correct(WORDS)
         return
     td = date.today()
     remaining_time = datetime.combine(td, remaining_time) - datetime.combine(td, time(0, 0, 1))
