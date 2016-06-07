@@ -28,9 +28,20 @@ clock = pygame.time.Clock()
 f = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
 font = pygame.font.Font(f,20)
 big_font = pygame.font.Font(f,24)
+prep_img = lambda x: pygame.transform.scale(
+    pygame.image.load(x),
+    (250, 150))
+SELECTED = (128, 0, 100)
+UNSELECTED = (128,128,128)
+PROGRESS_TEXT = " "*60+"Time: {0}"
+DESIRED_FPS = 60.0
+TIME = time(0, 1, 0)
+k = 100
+time_total_seconds = lambda tm: tm.hour*60*60 + tm.minute*60 + tm.second
+BAR_TICK = 100.0 / time_total_seconds(TIME)
+remaining_time = copy(TIME)
+selected_index = 0
 
-def time_to_total_seconds(tm):
-    return tm.hour*60*60 + tm.minute*60 + tm.second
 
 def drawText(message,pos,color=(255,255,255)):
     surface.blit(font.render(message,1,color),pos)
@@ -47,20 +58,6 @@ def drawProgressBar(message, progress):
     progressw = int((total/100.0)*(100-progress))
     drawSlot("", (20, 420), size=(total, 70))
     drawSlot(message, (20, 420), (0, 128, 233), (total-progressw, 70))
-
-
-prep_img = lambda x: pygame.transform.scale(
-    pygame.image.load(x),
-    (250, 150))
-SELECTED = (128, 0, 100)
-UNSELECTED = (128,128,128)
-PROGRESS_TEXT = " "*60+"Time: {0}"
-DESIRED_FPS = 60.0
-TIME = time(0, 1, 0)
-k = 100
-BAR_TICK = 100.0 / time_to_total_seconds(TIME)
-remaining_time = copy(TIME)
-selected_index = 0
 
 
 def draw_slots(words, selected_index, offset, margin):

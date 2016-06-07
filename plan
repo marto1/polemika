@@ -1,0 +1,36 @@
+#+STARTUP: overview
+#+TAGS: PROJECT(p) HOME(h) OFFICE(o) PHONE(t) ERRANDS(e)
+#+STARTUP: hidestars
+
+* 1000 core words
+** https://simple.wikipedia.org/wiki/Wikipedia:VOA_Special_English_Word_Book
+** get the dict translated in target language
+** have a base from which to jump to more complicated things
+** how syntax works in generals, common pitfalls with that
+** learning about pronunciation principles will make remembering
+   and understanding easier 
+* Sentences - news articles
+Fill in words. Scenario for a diferrent gameplay style.
+
+* game protocol
+** logic resides in server
+** server chooses random words from a pool
+** sends the words to the clients
+** clients may not receive the translations
+** clients send their guesses
+** server checks for correctness and if correct broadcasts this player as winner
+** server broadcasts correct guesses of other players to the rest BUT the orginal player
+** server sends current status of game to player that requested guess check
+
+* game protocol - messages
+** it's a LISP based protocol
+** messages begin with "(" and end with ")"
+** escaping can be done with ""
+** first element is usually the command type unless specified otherwise
+** nesting is valid, but only the outermost command is recognized as such
+** SRVMSG: (words (one two three)) - the words are one two three
+** CLTMSG: (guesses (en to tre)) - the client's guesses are en, to and tre
+** SRVMSG: (winner 0x123211) ; (winner 0x0) - winner is 0x123211 or winner is 0x0
+** SRVMSG: (correct 0x123211 (0 1 0)) - player 0x123211 guess for the second word is correct
+* AI player
+ 
