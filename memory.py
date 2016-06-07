@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
+
+#DON'T USE. DEPRICATED.
 from random import choice as c
 from sys import argv
 from time import sleep,time
 from functools import partial
 from twisted.internet import defer
+from tinydb import TinyDB, Query
 import json
 
 def one_to_many_arg(fn):
@@ -56,12 +59,24 @@ def keyboard_interrupt(e):
     import os #FUCK
     os._exit(1)
 
+@one_to_many_arg
+def record_game_stats(result, answer, elapsed):
+    Stats = Query()
+    p = db.get(Stats.games != None)
+    if not p:
+        db.insert({"games":[]})
+        p = db.get(Stats.games != None)
+    p["games"].append((result, answer, elapsed, int(time())))
+    db.update(p, eids=[p.eid,])
+    return result, answer, elapsed
+
 def prepare_game(game_chain):
     c1 = game_chain.addCallback
     c2 = game_chain.addCallbacks
     c1(start_measuring)
     c2(play_and_pass_time, pass_exception)
     c2(stop_measuring, pass_exception)
+    c2(record_game_stats, pass_exception)
     c2(prepare_react, pass_exception)
     c2(react_choice, keyboard_interrupt)
     return game_chain
@@ -87,13 +102,13 @@ def play(words):
 def main():
     with open(argv[1], "r") as f:
         data = [line for line in f.readlines()]
-    with open(argv[2], "w") as f:
-        results = {}
-        aftp = partial(after_play_hook, results)
-        aftr = partial(after_react_hook, results)
-        while True:
-            print("\x1b[2J\x1b[H")
-            play(data)
+    results = {}
+    aftp = partial(after_play_hook, results)
+    aftr = partial(after_react_hook, results)
+    while True:
+        print("\x1b[2J\x1b[H")
+        play(data)
 
 if __name__ == '__main__':
+    db = TinyDB(argv[2])
     main()
