@@ -50,21 +50,21 @@ prep_img = lambda x: pygame.transform.scale(
     pygame.image.load(x),
     (250, 150))
 
-def drawText(message,pos,color=(255,255,255)):
+def draw_text(message,pos,color=(255,255,255)):
     surface.blit(font.render(message,1,color),pos)
 
-def drawSlot(message, pos, color=(128,128,128), size=(500, 21)):
+def draw_slot(message, pos, color=(128,128,128), size=(500, 21)):
     slot_surface = pygame.Surface(size, pygame.SRCALPHA)
     slot_surface.fill(color)
     surface.blit(slot_surface, pos)
-    drawText(message, pos)
+    draw_text(message, pos)
 
-def drawProgressBar(message, progress):
+def draw_progressbar(message, progress):
     """progress from 0 to 100"""
     total = SCREEN_WIDTH-50
     progressw = int((total/100.0)*(100-progress))
-    drawSlot("", (20, 420), size=(total, 70))
-    drawSlot(message, (20, 420), (0, 128, 233), (total-progressw, 70))
+    draw_slot("", (20, 420), size=(total, 70))
+    draw_slot(message, (20, 420), (0, 128, 233), (total-progressw, 70))
 
 
 def draw_slots(words, selected_index, offset, margin):
@@ -76,7 +76,7 @@ def draw_slots(words, selected_index, offset, margin):
             (offset[0],offset[1]+margin*multiplier)]
         if selected_index == (multiplier-1):
             args.append(SELECTED)
-        drawSlot(*args)
+        draw_slot(*args)
         multiplier += 1
 
 def draw_game():
@@ -88,7 +88,7 @@ def draw_game():
     surface.blit(pygame.transform.scale(t_surface,(w,h)),
                  (8,SCREEN_HEIGHT-30))
     surface.blit(t_lb_surface,(0,0))
-    drawText("FPS: " + str(int(clock.get_fps())),(10,SCREEN_HEIGHT-30))
+    draw_text("FPS: " + str(int(clock.get_fps())),(10,SCREEN_HEIGHT-30))
     surface.blit(big_font.render("Guess words",0,
                                  (255,255,255)),(SCREEN_WIDTH/2.5,20))
     draw_slots(WORDS, selected_index, (30,20), 35)
@@ -97,7 +97,7 @@ def draw_game():
             WORDS[selected_index]['pic'],
             (SCREEN_WIDTH-260, 20+margin))
 
-    drawProgressBar(
+    draw_progressbar(
         PROGRESS_TEXT.format(str(remaining_time)),
         round(progress_percent))
     #TODO make progress bar smooth
