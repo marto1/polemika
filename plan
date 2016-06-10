@@ -33,6 +33,9 @@ Fill in words. Scenario for a diferrent gameplay style.
 ** SRVMSG: (winner 0x123211) ; (winner 0x0) - winner is 0x123211 or winner is 0x0
 ** SRVMSG: (guesses (en to tre)) - server sends back correct guesses
 ** SRVMSG: (correct 0x123211 (0 1 0)) - player 0x123211 guess for the second word is correct
+** SRVMSG: (total_time 4200) - the total time of the game is 4200 seconds
+** SRVMSG: (tick 3) - server sends master tick at 3. Ticks countdown 
+** SRVMSG: (reset) - server resets internal states to initial ones.
 * AI player
 ** plays via the game protocol
 ** memorizes words with varied success 

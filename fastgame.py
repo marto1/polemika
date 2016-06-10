@@ -7,7 +7,6 @@ from datetime import datetime, date
 
 import pygame,random,math
 from pygame.locals import *
-from math import fabs
 from random import randint
 from datetime import time, tzinfo, timedelta
 from copy import copy
@@ -209,4 +208,3 @@ rem = LoopingCall(countdown_remaining_time)
 rem.start(1)
 
 reactor.run()
-
