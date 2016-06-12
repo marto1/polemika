@@ -16,6 +16,9 @@ from sexpdata import loads, dumps, Symbol
 from functools import partial
 import string
 
+NUMBER_PLAYERS = 1
+TIME = 4200 #seconds
+
 class Bunch:
     def __init__(self, **kwds):
         self.__dict__.update(kwds)
@@ -30,6 +33,8 @@ COMMANDS = {
     "correct" : 'correct',
     "total_time" : 'total_time',
     "tick" : 'tick',
+    "ready" : "ready",
+    "error" : "error",
 }
 
 def dump_command(command, *args):
@@ -62,7 +67,6 @@ def process_dict(data):
 data = read_whole_dict("words")
 total_words = process_dict(data)
 words = random.sample(total_words, 5)
-TIME = 4200 #seconds
 remaining_time = TIME
 
 def countdown_remaining_time(x=None):
@@ -78,11 +82,10 @@ def reset_game(remaining_time):
     words = random.sample(total_words, 5)
     return words
 
-
 def countdown_task():
     res = defer.Deferred()
     res.addCallback(countdown_remaining_time)
-    res.addCallback(lambda x: print(x))
+    #res.addCallback(lambda x: print(x))
     return res
 
 rstr = lambda N: ''.join(random.choice(
@@ -94,13 +97,28 @@ class GameProtocol(LineReceiver):
         self.users = users
         self.name = rstr(20)
         self.users[self.name] = self
+        #FIXME map with COMMANDS
+        self.handlers = {'ready': self.respond_ready}
         
     def lineReceived(self, line):
-        return 
+        print("RAW:" + line)
+        try:
+            rdata = loads(line)
+            print(rdata)
+        except Exception:
+            self.write(cmd.error, 10, "Invalid syntax")
+
 
     def connectionLost(self, reason):
         if self.users.has_key(self.name):
             del self.users[self.name]
+
+    def write(self, func, *args):
+        self.transport.write(
+            (func(*args) + '\r\n').encode('utf-8'))
+
+    def respond_ready(self):
+        pass
 
 class GameFactory(Factory):
 

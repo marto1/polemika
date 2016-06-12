@@ -21,6 +21,7 @@ Fill in words. Scenario for a diferrent gameplay style.
 ** server checks for correctness and if correct broadcasts this player as winner
 ** server broadcasts correct guesses of other players to the rest BUT the orginal player
 ** server sends current status of game to player that requested guess check
+** The protocol structural parts are strictly ASCII encoded, but payloads are assumed to be UTF-8
 * game protocol - messages
 ** it's a s-expressions based protocol
 ** messages begin with "(" and end with ")"
@@ -36,6 +37,7 @@ Fill in words. Scenario for a diferrent gameplay style.
 ** SRVMSG: (total_time 4200) - the total time of the game is 4200 seconds
 ** SRVMSG: (tick 3) - server sends master tick at 3. Ticks countdown 
 ** SRVMSG: (reset) - server resets internal states to initial ones.
+** SRV/CLTMSG: (error 10 "Invalid syntax") - detected syntax error
 * AI player
 ** plays via the game protocol
 ** memorizes words with varied success 
