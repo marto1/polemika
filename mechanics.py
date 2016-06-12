@@ -104,10 +104,19 @@ class GameProtocol(LineReceiver):
         print("RAW:" + line)
         try:
             rdata = loads(line)
-            print(rdata)
         except Exception:
-            self.write(cmd.error, 10, "Invalid syntax")
-
+            self.error(10, "Invalid syntax")
+        else:
+            if len(rdata) == 0:
+                self.error(12, "Empty set")
+                return
+            if type(rdata[0]) != Symbol:
+                self.error(13, "First element is not a symbol")
+                return
+            if rdata[0].value() in self.handlers:
+                self.handlers[rdata[0].value()](rdata[1:])
+            else:
+                self.error(11, "Unrecognized command")
 
     def connectionLost(self, reason):
         if self.users.has_key(self.name):
@@ -117,8 +126,11 @@ class GameProtocol(LineReceiver):
         self.transport.write(
             (func(*args) + '\r\n').encode('utf-8'))
 
-    def respond_ready(self):
-        pass
+    def error(self, code, message):
+        self.write(cmd.error, code, message)
+
+    def respond_ready(self, data):
+        print('READY!' + str(data))
 
 class GameFactory(Factory):
 
