@@ -19,7 +19,7 @@ import string
 NUMBER_PLAYERS = 1
 TIME = 4200 #seconds
 
-class Bunch:
+class Bunch(object):
     def __init__(self, **kwds):
         self.__dict__.update(kwds)
 
@@ -64,28 +64,23 @@ def process_line(line):
 def process_dict(data):
     return [process_line(line) for line in data]
 
-data = read_whole_dict("words")
-total_words = process_dict(data)
-words = random.sample(total_words, 5)
-remaining_time = TIME
 
-def countdown_remaining_time(x=None):
-    global remaining_time
-    if remaining_time == 0: return False
-    remaining_time -= 1
-    return True
+def countdown_remaining_time(x=None, state=None):
+    if state.remaining_time == 0: return -1
+    state.remaining_time -= 1
+    return state.remaining_time
 
-def reset_game(remaining_time): 
-    remaining_time = TIME
-    rem.start(1)
-    total_words = process_dict(data) #FIXME why
-    words = random.sample(total_words, 5)
-    return words
+# def reset_game(remaining_time): 
+#     remaining_time = TIME
+#     rem.start(1)
+#     total_words = process_dict(data) #FIXME why
+#     words = random.sample(total_words, 5)
+#     return words
 
-def countdown_task():
+def countdown_task(state):
     res = defer.Deferred()
-    res.addCallback(countdown_remaining_time)
-    #res.addCallback(lambda x: print(x))
+    res.addCallback(countdown_remaining_time, state)
+    res.addCallback(lambda x: print(x))
     return res
 
 rstr = lambda N: ''.join(random.choice(
@@ -93,7 +88,8 @@ rstr = lambda N: ''.join(random.choice(
 
 class GameProtocol(LineReceiver):
 
-    def __init__(self, users):
+    def __init__(self, users, state):
+        self.state = state
         self.users = users
         self.name = rstr(20)
         self.users[self.name] = self
@@ -130,20 +126,26 @@ class GameProtocol(LineReceiver):
         self.write(cmd.error, code, message)
 
     def respond_ready(self, data):
-        print('READY!' + str(data))
+        print('READY! ' + str(self.state['remaining_time']))
 
 class GameFactory(Factory):
 
     def __init__(self):
+        data = read_whole_dict("words") #FIXME blocks
+        total_words = process_dict(data)
+        self.state = Bunch()
+        self.state.total_words = total_words
+        self.state.words = random.sample(total_words, 5)
+        self.state.time = TIME
+        self.state.remaining_time = TIME
+        t = lambda x: countdown_task(x).callback(None)
+        self.rem = LoopingCall(t, self.state)
+        self.rem.start(1)
         self.users = {}
 
     def buildProtocol(self, addr):
-        return GameProtocol(self.users)
+        return GameProtocol(self.users, self.state)
 
-if __name__ == '__main__':    
-    rem = LoopingCall(lambda: countdown_task().callback(None))
-    rem.start(1)
-    
+if __name__ == '__main__':
     reactor.listenTCP(9022, GameFactory())
-
     reactor.run()
