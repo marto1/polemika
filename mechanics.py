@@ -16,7 +16,7 @@ from sexpdata import loads, dumps, Symbol
 from functools import partial
 import string
 
-NUMBER_PLAYERS = 1
+NUMBER_PLAYERS = 2
 TIME = 4200 #seconds
 
 class Bunch(object):
@@ -35,6 +35,7 @@ COMMANDS = {
     "tick" : 'tick',
     "ready" : "ready",
     "error" : "error",
+    "disconnected" : "disconnected",
 }
 
 def dump_command(command, *args):
@@ -70,17 +71,18 @@ def countdown_remaining_time(x=None, state=None):
     state.remaining_time -= 1
     return state.remaining_time
 
-# def reset_game(remaining_time): 
-#     remaining_time = TIME
-#     rem.start(1)
-#     total_words = process_dict(data) #FIXME why
-#     words = random.sample(total_words, 5)
-#     return words
+def reset_game(x=None, state=None):
+    print(x)
+    # remaining_time = TIME
+    # rem.start(1)
+    # total_words = process_dict(data) #FIXME why
+    # words = random.sample(total_words, 5)
+    return x
 
 def countdown_task(state):
     res = defer.Deferred()
     res.addCallback(countdown_remaining_time, state)
-    res.addCallback(lambda x: print(x))
+    res.addCallback(reset_game, state)
     return res
 
 rstr = lambda N: ''.join(random.choice(
@@ -93,8 +95,9 @@ class GameProtocol(LineReceiver):
         self.users = users
         self.name = rstr(20)
         self.users[self.name] = self
+        self.phase = "initial"
         #FIXME map with COMMANDS
-        self.handlers = {'ready': self.respond_ready}
+        self.handlers = {'ready': self.process_ready}
         
     def lineReceived(self, line):
         print("RAW:" + line)
@@ -117,6 +120,13 @@ class GameProtocol(LineReceiver):
     def connectionLost(self, reason):
         if self.users.has_key(self.name):
             del self.users[self.name]
+            self.broadcast(cmd.disconnected, self.name)
+            self.state.phase = "initial"
+            if self.state.rem.running:
+                self.state.rem.stop()
+            if self.state.tick.running:
+                self.state.tick.stop()
+            self.state.remaining_time = self.state.time
 
     def write(self, func, *args):
         self.transport.write(
@@ -125,8 +135,28 @@ class GameProtocol(LineReceiver):
     def error(self, code, message):
         self.write(cmd.error, code, message)
 
-    def respond_ready(self, data):
-        print('READY! ' + str(self.state['remaining_time']))
+    def broadcast(self, func, *args):
+        for user in self.users.values():
+            GameProtocol.write(user, func, *args)
+
+    def is_ready(self):
+        return self.phase == "ready"
+
+    def process_ready(self, data):
+        self.phase = "ready"
+        nplayers = self.state.number_players
+        allrdy = all(map(GameProtocol.is_ready, self.users.values()))
+        if allrdy and len(self.users) == nplayers and self.state.phase == "initial":
+            self.state.phase = "ready"
+            self.broadcast(cmd.ready)
+            t = lambda x: countdown_task(x).callback(None)
+            self.state.rem = LoopingCall(t, self.state)
+            self.state.rem.start(1)
+            self.state.tick = LoopingCall(
+                lambda: self.broadcast(
+                    cmd.tick,
+                    self.state.remaining_time))
+            self.state.tick.start(3)
 
 class GameFactory(Factory):
 
@@ -138,9 +168,8 @@ class GameFactory(Factory):
         self.state.words = random.sample(total_words, 5)
         self.state.time = TIME
         self.state.remaining_time = TIME
-        t = lambda x: countdown_task(x).callback(None)
-        self.rem = LoopingCall(t, self.state)
-        self.rem.start(1)
+        self.state.number_players = NUMBER_PLAYERS
+        self.state.phase = "initial"
         self.users = {}
 
     def buildProtocol(self, addr):

@@ -15,6 +15,8 @@ Fill in words. Scenario for a diferrent gameplay style.
 * game protocol
 ** logic resides in server
 ** server chooses random words from a pool
+** server waits for ready commands from all players
+** server broadcasts ready command to all players signifying start of game
 ** sends the words to the clients
 ** clients may not receive the translations
 ** clients send their guesses
@@ -38,6 +40,7 @@ Fill in words. Scenario for a diferrent gameplay style.
 ** SRVMSG: (tick 3) - server sends master tick at 3. Ticks countdown 
 ** SRVMSG: (reset) - server resets internal states to initial ones.
 ** SRV/CLTMSG: (error 10 "Invalid syntax") - detected syntax error
+** SRV: (disconnected "0x11111") - player "0x11111" disconnected
 * AI player
 ** plays via the game protocol
 ** memorizes words with varied success 
