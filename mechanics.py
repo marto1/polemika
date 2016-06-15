@@ -54,7 +54,7 @@ def read_whole_dict(filename):
 
 def process_line(line):
     raw = line[:-1].split(",")
-    img = None
+    img = ""
     if len(raw) == 3:
         img = raw[2]
     return {
@@ -97,7 +97,10 @@ class GameProtocol(LineReceiver):
         self.users[self.name] = self
         self.phase = "initial"
         #FIXME map with COMMANDS
-        self.handlers = {'ready': self.process_ready}
+        self.handlers = {
+            'ready': self.process_ready,
+            'guesses': self.process_guesses,
+        }
         
     def lineReceived(self, line):
         print("RAW:" + line)
@@ -122,9 +125,9 @@ class GameProtocol(LineReceiver):
             del self.users[self.name]
             self.broadcast(cmd.disconnected, self.name)
             self.state.phase = "initial"
-            if self.state.rem.running:
+            if self.state.rem and self.state.rem.running:
                 self.state.rem.stop()
-            if self.state.tick.running:
+            if self.state.tick and self.state.tick.running:
                 self.state.tick.stop()
             self.state.remaining_time = self.state.time
 
@@ -149,6 +152,9 @@ class GameProtocol(LineReceiver):
         if allrdy and len(self.users) == nplayers and self.state.phase == "initial":
             self.state.phase = "ready"
             self.broadcast(cmd.ready)
+            self.broadcast(cmd.players, self.users.keys())
+            w = tuple((x['word'], x['pic']) for x in self.state.words)
+            self.broadcast(cmd.words, w)
             t = lambda x: countdown_task(x).callback(None)
             self.state.rem = LoopingCall(t, self.state)
             self.state.rem.start(1)
@@ -157,6 +163,10 @@ class GameProtocol(LineReceiver):
                     cmd.tick,
                     self.state.remaining_time))
             self.state.tick.start(3)
+
+    def process_guesses(self, data):
+        pass
+        #data[0]
 
 class GameFactory(Factory):
 
@@ -170,6 +180,8 @@ class GameFactory(Factory):
         self.state.remaining_time = TIME
         self.state.number_players = NUMBER_PLAYERS
         self.state.phase = "initial"
+        self.state.rem = None
+        self.state.tick = None
         self.users = {}
 
     def buildProtocol(self, addr):

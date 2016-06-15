@@ -17,6 +17,7 @@ Fill in words. Scenario for a diferrent gameplay style.
 ** server chooses random words from a pool
 ** server waits for ready commands from all players
 ** server broadcasts ready command to all players signifying start of game
+** server broadcasts list of players
 ** sends the words to the clients
 ** clients may not receive the translations
 ** clients send their guesses
