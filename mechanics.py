@@ -16,7 +16,7 @@ from sexpdata import loads, dumps, Symbol
 from functools import partial
 import string
 
-NUMBER_PLAYERS = 2
+NUMBER_PLAYERS = 1
 TIME = 4200 #seconds
 
 class Bunch(object):
@@ -97,11 +97,18 @@ class GameProtocol(LineReceiver):
         self.users[self.name] = self
         self.phase = "initial"
         #FIXME map with COMMANDS
+        self.process_players = lambda y: y
+        self.process_words = lambda y: y
+        self.process_tick = lambda y: y
         self.handlers = {
             'ready': self.process_ready,
             'guesses': self.process_guesses,
+            'error' : self.process_errors,
+            'players' : self.process_players,
+            'words' : self.process_words,
+            'tick' : self.process_tick,
         }
-        
+
     def lineReceived(self, line):
         print("RAW:" + line)
         try:
@@ -167,6 +174,9 @@ class GameProtocol(LineReceiver):
     def process_guesses(self, data):
         pass
         #data[0]
+
+    def process_errors(self, data):
+        print('error received: {0}'.format(data))
 
 class GameFactory(Factory):
 
