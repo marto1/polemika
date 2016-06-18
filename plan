@@ -26,6 +26,7 @@ Fill in words. Scenario for a diferrent gameplay style.
 ** server sends current status of game to player that requested guess check
 ** The protocol structural parts are strictly ASCII encoded, but payloads are assumed to be UTF-8
 * game protocol - messages
+** frames are separated with '\r\n'
 ** it's a s-expressions based protocol
 ** messages begin with "(" and end with ")"
 ** escaping can be done with ""

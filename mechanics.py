@@ -16,7 +16,7 @@ from sexpdata import loads, dumps, Symbol
 from functools import partial
 import string
 
-NUMBER_PLAYERS = 1
+NUMBER_PLAYERS = 2
 TIME = 4200 #seconds
 
 class Bunch(object):
@@ -88,7 +88,26 @@ def countdown_task(state):
 rstr = lambda N: ''.join(random.choice(
     string.ascii_uppercase + string.digits) for _ in range(N))
 
+
+def equal_words(words, guesses):
+    k = 0
+    res = []
+    for guess in guesses:
+        print(words[k][0], end=" ")
+        print(guess)
+        if words[k][0] == guess:
+            res.append(1)
+        else:
+            res.append(0)
+        k += 1
+    return res
+
 class GameProtocol(LineReceiver):
+
+    def process_tick(self, data): pass
+    def process_players(self, data): pass
+    def process_words(self, data): pass
+    def process_total_time(self, data): pass
 
     def __init__(self, users, state):
         self.state = state
@@ -97,9 +116,6 @@ class GameProtocol(LineReceiver):
         self.users[self.name] = self
         self.phase = "initial"
         #FIXME map with COMMANDS
-        self.process_players = lambda y: y
-        self.process_words = lambda y: y
-        self.process_tick = lambda y: y
         self.handlers = {
             'ready': self.process_ready,
             'guesses': self.process_guesses,
@@ -107,6 +123,7 @@ class GameProtocol(LineReceiver):
             'players' : self.process_players,
             'words' : self.process_words,
             'tick' : self.process_tick,
+            'total_time' : self.process_total_time,
         }
 
     def lineReceived(self, line):
@@ -149,6 +166,11 @@ class GameProtocol(LineReceiver):
         for user in self.users.values():
             GameProtocol.write(user, func, *args)
 
+    def broadcast_rest(self, func, *args):
+        for user in self.users.values():
+            if self != user:
+                GameProtocol.write(user, func, *args)
+
     def is_ready(self):
         return self.phase == "ready"
 
@@ -159,8 +181,11 @@ class GameProtocol(LineReceiver):
         if allrdy and len(self.users) == nplayers and self.state.phase == "initial":
             self.state.phase = "ready"
             self.broadcast(cmd.ready)
+            self.broadcast(cmd.total_time, self.state.time)
             self.broadcast(cmd.players, self.users.keys())
-            w = tuple((x['word'], x['pic']) for x in self.state.words)
+            self.state.comparison_words = tuple(tuple(x.values()) for x in self.state.words)
+            print(self.state.comparison_words)
+            w = tuple((x[2], x[1]) for x in self.state.comparison_words)
             self.broadcast(cmd.words, w)
             t = lambda x: countdown_task(x).callback(None)
             self.state.rem = LoopingCall(t, self.state)
@@ -172,11 +197,15 @@ class GameProtocol(LineReceiver):
             self.state.tick.start(3)
 
     def process_guesses(self, data):
-        pass
-        #data[0]
+        results = equal_words(self.state.comparison_words, data[0])
+        if all(results):
+            self.broadcast(cmd.winner, self.name)
+        else:
+            self.broadcast_rest(cmd.correct, self.name, results)
 
     def process_errors(self, data):
         print('error received: {0}'.format(data))
+
 
 class GameFactory(Factory):
 
