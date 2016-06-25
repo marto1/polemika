@@ -30,7 +30,7 @@ Fill in words. Scenario for a diferrent gameplay style.
 ** it's a s-expressions based protocol
 ** messages begin with "(" and end with ")"
 ** escaping can be done with ""
-** first element is usually the command type unless specified otherwise
+** first element is the command type unless specified otherwise
 ** nesting is valid, but only the outermost command is recognized as such
 ** SRVMSG: (players ("0x11111" "0x123211" "0x12222")) list of players 
 ** SRVMSG: (words ("one" "two" "three")) - the words are one two three
@@ -43,6 +43,11 @@ Fill in words. Scenario for a diferrent gameplay style.
 ** SRVMSG: (reset) - server resets internal states to initial ones.
 ** SRV/CLTMSG: (error 10 "Invalid syntax") - detected syntax error
 ** SRV: (disconnected "0x11111") - player "0x11111" disconnected
+* Dummy AI player
+** plays via the game protocol
+** sends guesses as fast as possible
+** picks a random sequence of letters based on a letter pool
+** word length is variable and maximum len is based on a constant 
 * AI player
 ** plays via the game protocol
 ** memorizes words with varied success 

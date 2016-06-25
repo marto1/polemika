@@ -213,7 +213,11 @@ class GameProtocol(LineReceiver):
         results = equal_words(self.state.comparison_words, data[0])
         if all(results):
             self.broadcast(cmd.winner, self.name)
+            self.broadcast(cmd.guesses, self.state.comparison_words)
+            self.state.words = random.sample(total_words,
+                                             self.state.total_words)
             self.broadcast(cmd.reset)
+            self.process_ready([])
         else:
             self.broadcast_rest(cmd.correct, self.name, results)
 

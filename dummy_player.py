@@ -50,6 +50,9 @@ class DummyAI(GameProtocol):
         self.state.phase = "initial"
         self.state.guess.stop()
 
+    def process_guesses(self, data):
+        print("TRANSLATIONS {0}".format(data))
+
     def make_guesses(self):
         if self.state.remaining_time == 0: return
         if self.state.phase == "over": return
