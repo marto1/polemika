@@ -16,8 +16,8 @@ from sexpdata import loads, dumps, Symbol
 from functools import partial
 import string
 
-NUMBER_PLAYERS = 2
-TIME = 4200 #seconds
+NUMBER_PLAYERS = 1
+TIME = 30 #seconds
 
 class Bunch(object):
     def __init__(self, **kwds):
@@ -73,10 +73,7 @@ def countdown_remaining_time(x=None, state=None):
 
 def reset_game(x=None, state=None):
     print(x)
-    # remaining_time = TIME
-    # rem.start(1)
-    # total_words = process_dict(data) #FIXME why
-    # words = random.sample(total_words, 5)
+    if x == -1: state.phase = "timeout"
     return x
 
 def countdown_task(state):
@@ -108,6 +105,7 @@ class GameProtocol(LineReceiver):
     def process_players(self, data): pass
     def process_words(self, data): pass
     def process_total_time(self, data): pass
+    def process_reset(self, data): pass
 
     def __init__(self, users, state):
         self.state = state
@@ -124,6 +122,7 @@ class GameProtocol(LineReceiver):
             'words' : self.process_words,
             'tick' : self.process_tick,
             'total_time' : self.process_total_time,
+            'reset' : self.process_reset,
         }
 
     def lineReceived(self, line):
@@ -144,16 +143,20 @@ class GameProtocol(LineReceiver):
             else:
                 self.error(11, "Unrecognized command")
 
+    def reset_state(self):
+        self.state.phase = "initial"
+        self.state.remaining_time = self.state.time
+        if self.state.rem and self.state.rem.running:
+            self.state.rem.stop()
+        if self.state.tick and self.state.tick.running:
+            self.state.tick.stop()
+
     def connectionLost(self, reason):
         if self.users.has_key(self.name):
             del self.users[self.name]
             self.broadcast(cmd.disconnected, self.name)
-            self.state.phase = "initial"
-            if self.state.rem and self.state.rem.running:
-                self.state.rem.stop()
-            if self.state.tick and self.state.tick.running:
-                self.state.tick.stop()
-            self.state.remaining_time = self.state.time
+            self.broadcast(cmd.reset)
+            self.reset_state()
 
     def write(self, func, *args):
         self.transport.write(
@@ -187,8 +190,7 @@ class GameProtocol(LineReceiver):
             print(self.state.comparison_words)
             w = tuple((x[2], x[1]) for x in self.state.comparison_words)
             self.broadcast(cmd.words, w)
-            t = lambda x: countdown_task(x).callback(None)
-            self.state.rem = LoopingCall(t, self.state)
+            self.state.rem = LoopingCall(self.countdown)
             self.state.rem.start(1)
             self.state.tick = LoopingCall(
                 lambda: self.broadcast(
@@ -196,10 +198,22 @@ class GameProtocol(LineReceiver):
                     self.state.remaining_time))
             self.state.tick.start(3)
 
+    def countdown(self):
+        timer = countdown_task(self.state)
+        timer.addCallback(self.check_for_timeout)
+        return timer.callback(None)
+
+    def check_for_timeout(self, res):
+        if self.state.phase == "timeout":
+            self.broadcast(cmd.reset)
+            self.reset_state()
+            self.process_ready([])
+
     def process_guesses(self, data):
         results = equal_words(self.state.comparison_words, data[0])
         if all(results):
             self.broadcast(cmd.winner, self.name)
+            self.broadcast(cmd.reset)
         else:
             self.broadcast_rest(cmd.correct, self.name, results)
 

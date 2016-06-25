@@ -44,7 +44,10 @@ class DummyAI(GameProtocol):
         self.state.phase = "game"
 
     def process_winner(self, data):
-        self.state.phase = "over"
+        pass
+
+    def process_reset(self, data):
+        self.state.phase = "initial"
         self.state.guess.stop()
 
     def make_guesses(self):
@@ -61,15 +64,19 @@ class DummyAI(GameProtocol):
 def write_on_connection(p):
     p.write(cmd.ready)
 
-if __name__ == '__main__':
-    point = TCP4ClientEndpoint(reactor, "localhost", 9022)
-    state = Bunch()
+
+def reset_state(state):
     state.phase = "initial"
     state.rem = None
     state.tick = None
     state.guess = None
     state.time = -1
     state.remaining_time = -1
+
+if __name__ == '__main__':
+    point = TCP4ClientEndpoint(reactor, "localhost", 9022)
+    state = Bunch()
+    reset_state(state)
     d = connectProtocol(point, DummyAI({}, state))
     d.addCallback(write_on_connection)
     reactor.run()
