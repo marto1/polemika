@@ -48,7 +48,8 @@ class DummyAI(GameProtocol):
 
     def process_reset(self, data):
         self.state.phase = "initial"
-        self.state.guess.stop()
+        if self.state.guess and self.state.guess.running:
+            self.state.guess.stop()
 
     def process_guesses(self, data):
         print("TRANSLATIONS {0}".format(data))

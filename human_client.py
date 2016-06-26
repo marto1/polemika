@@ -10,9 +10,28 @@ from pygame.locals import *
 from random import randint
 from datetime import time, tzinfo, timedelta
 from copy import copy
+from dummy_player import DummyAI, reset_state, write_on_connection
+from twisted.internet.endpoints import TCP4ClientEndpoint
+from twisted.internet.endpoints import connectProtocol
+from mechanics import COMMANDS, cmd, GameProtocol, Bunch
 import random
 
-#TODO refactor
+
+def convert_to_dict(words):
+    res = []
+    for word in words:
+        res.append({
+            "word" :  word[0].decode("utf-8"),
+            "pic"  :  word[1],
+            "trans":  u"",
+            "guess":  u"",})
+    return res
+
+class HumanPlayer(DummyAI):
+
+    def process_words(self, data):
+        global WORDS
+        WORDS = convert_to_dict(data[0])
 
 #constants
 STDFONT = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
@@ -82,13 +101,13 @@ def draw_game():
     global selected_index
     w,h = font.size("FPS:        ")
     margin = 35
-    # surface.blit(pygame.transform.scale(t_surface,(w,h)),
-    #              (8,SCREEN_HEIGHT-30))
-    # surface.blit(t_lb_surface,(0,0))
-    # draw_text("FPS: " + str(int(clock.get_fps())),(10,SCREEN_HEIGHT-30))
-    # surface.blit(big_font.render("Guess words",0,
-    #                              (255,255,255)),(SCREEN_WIDTH/2.5,20))
-    # draw_slots(WORDS, selected_index, (30,20), 35)
+    surface.blit(pygame.transform.scale(t_surface,(w,h)),
+                 (8,SCREEN_HEIGHT-30))
+    surface.blit(t_lb_surface,(0,0))
+    draw_text("FPS: " + str(int(clock.get_fps())),(10,SCREEN_HEIGHT-30))
+    surface.blit(big_font.render("Guess words",0,
+                                 (255,255,255)),(SCREEN_WIDTH/2.5,20))
+    draw_slots(WORDS, selected_index, (30,20), 35)
     # if WORDS[selected_index]['pic']:
     #     surface.blit(
     #         WORDS[selected_index]['pic'],
@@ -127,7 +146,8 @@ def process_events(): #why polling? can't we use twisted for that?
                 #send shit to server
                 pass
             else: #assume text input
-                WORDS[selected_index]["guess"] += event.unicode
+                if len(WORDS) > 0:
+                    WORDS[selected_index]["guess"] += event.unicode
 
 def show_correct(words):
     for word in words:
@@ -183,9 +203,7 @@ def reset_game():
     WORDS = random.sample(total_words, 5)
 
 
-data = read_whole_dict("words")
-total_words = process_dict(data)
-WORDS = random.sample(total_words, 5)
+WORDS = []
 
 tick = LoopingCall(game_tick)
 tick.start(1.0 / DESIRED_FPS)
@@ -196,4 +214,10 @@ ev.start(1.0 / 30)
 # rem = LoopingCall(countdown_remaining_time)
 # rem.start(1)
 
-reactor.run()
+if __name__ == '__main__':
+    point = TCP4ClientEndpoint(reactor, "localhost", 9022)
+    state = Bunch()
+    reset_state(state)
+    d = connectProtocol(point, HumanPlayer({}, state))
+    d.addCallback(write_on_connection)
+    reactor.run()
