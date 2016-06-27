@@ -16,6 +16,10 @@ from twisted.internet.endpoints import connectProtocol
 from mechanics import COMMANDS, cmd, GameProtocol, Bunch
 import random
 
+def to_hms(seconds):
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    return "%d:%02d:%02d" % (h, m, s)
 
 def convert_to_dict(words):
     res = []
@@ -33,6 +37,25 @@ class HumanPlayer(DummyAI):
         global WORDS
         WORDS = convert_to_dict(data[0])
 
+    def process_tick(self, data):
+        global remaining_time
+        global progress_percent
+        self.state.remaining_time = data[0]
+        remaining_time = data[0]
+        progress_percent = BAR_TICK * remaining_time
+
+    # def process_reset(self, data):
+    #     DummyAI.process_reset(self, data)        
+
+    def process_total_time(self, data):
+        global TIME
+        global BAR_TICK
+        global progress_percent
+        self.state.time = data[0]
+        TIME = data[0]
+        BAR_TICK = 100.0 / TIME
+        progress_percent = 100
+
 #constants
 STDFONT = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
 PROGRESS_TEXT = " "*60+"Time: {0}"
@@ -44,7 +67,8 @@ DEFAULT_TABLE_COLOR = (50,50,50,80)
 VICTORY_TABLE_COLOR=(0,180,0,80)
 DEFEAT_TABLE_COLOR = (180,0,0,80)
 time_total_seconds = lambda tm: tm.hour*60*60 + tm.minute*60 + tm.second
-# BAR_TICK = 100.0 / time_total_seconds(TIME)
+BAR_TICK = 0
+
 
 pygame.init()
 
@@ -60,6 +84,8 @@ font = pygame.font.Font(STDFONT,20)
 big_font = pygame.font.Font(STDFONT,24)
 progress_percent = 100
 selected_index = 0
+TIME = -1
+remaining_time = -1
 
 
 prep_img = lambda x: pygame.transform.scale(
@@ -113,10 +139,10 @@ def draw_game():
     #         WORDS[selected_index]['pic'],
     #         (SCREEN_WIDTH-260, 20+margin))
 
-    # draw_progressbar(
-    #     PROGRESS_TEXT.format(str(remaining_time)),
-    #     round(progress_percent))
     #TODO make progress bar smooth
+    draw_progressbar(
+        PROGRESS_TEXT.format(str(to_hms(remaining_time))),
+        round(progress_percent))    
 
 def game_tick():
     clock.tick(DESIRED_FPS)
