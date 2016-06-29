@@ -26,7 +26,7 @@ def convert_to_dict(words):
     for word in words:
         res.append({
             "word" :  word[0].decode("utf-8"),
-            "pic"  :  word[1],
+            "pic"  :  prep_img(word[1]),
             "trans":  u"",
             "guess":  u"",})
     return res
@@ -134,10 +134,11 @@ def draw_game():
     surface.blit(big_font.render("Guess words",0,
                                  (255,255,255)),(SCREEN_WIDTH/2.5,20))
     draw_slots(WORDS, selected_index, (30,20), 35)
-    # if WORDS[selected_index]['pic']:
-    #     surface.blit(
-    #         WORDS[selected_index]['pic'],
-    #         (SCREEN_WIDTH-260, 20+margin))
+    if len(WORDS) > 0:
+        if WORDS[selected_index]['pic']:
+            surface.blit(
+                WORDS[selected_index]['pic'],
+                (SCREEN_WIDTH-260, 20+margin))
 
     #TODO make progress bar smooth
     draw_progressbar(
