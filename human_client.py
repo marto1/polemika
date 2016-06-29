@@ -149,8 +149,8 @@ def game_tick():
     draw_game()
     pygame.display.flip()
 
-
-def process_events(): #why polling? can't we use twisted for that?
+#why polling? can't we use twisted for that?
+def process_events(state, p):
     global selected_index
     keys = pygame.key.get_pressed()
     if keys[pygame.K_BACKSPACE]:
@@ -158,7 +158,7 @@ def process_events(): #why polling? can't we use twisted for that?
         WORDS[selected_index]["guess"] = w[:-1]
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            reactor.stop() # just stop somehow
+            reactor.stop()
         elif event.type == pygame.KEYDOWN:
             if event.key in [pygame.K_DOWN, pygame.K_TAB]:
                 selected_index += 1
@@ -169,8 +169,7 @@ def process_events(): #why polling? can't we use twisted for that?
                 if selected_index < 0:
                     selected_index = len(WORDS) - 1
             elif event.key == pygame.K_RETURN:
-                #send shit to server
-                pass
+                p.write(cmd.guesses, [x['guess'] for x in WORDS])
             else: #assume text input
                 if len(WORDS) > 0:
                     WORDS[selected_index]["guess"] += event.unicode
@@ -231,14 +230,17 @@ def reset_game():
 
 WORDS = []
 
-tick = LoopingCall(game_tick)
-tick.start(1.0 / DESIRED_FPS)
-
-ev = LoopingCall(process_events)
-ev.start(1.0 / 30)
 
 # rem = LoopingCall(countdown_remaining_time)
 # rem.start(1)
+
+def start_game_loops(p, state):
+    tick = LoopingCall(game_tick)
+    tick.start(1.0 / DESIRED_FPS)
+
+    ev = LoopingCall(process_events, state, p)
+    ev.start(1.0 / 30)
+    return p
 
 if __name__ == '__main__':
     point = TCP4ClientEndpoint(reactor, "localhost", 9022)
@@ -246,4 +248,5 @@ if __name__ == '__main__':
     reset_state(state)
     d = connectProtocol(point, HumanPlayer({}, state))
     d.addCallback(write_on_connection)
+    d.addCallback(start_game_loops, state)
     reactor.run()

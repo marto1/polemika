@@ -67,6 +67,7 @@ class DummyAI(GameProtocol):
 
 def write_on_connection(p):
     p.write(cmd.ready)
+    return p
 
 
 def reset_state(state):
