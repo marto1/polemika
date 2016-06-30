@@ -24,9 +24,13 @@ def to_hms(seconds):
 def convert_to_dict(words):
     res = []
     for word in words:
+        if word[1] != "":
+            p = prep_img(word[1])
+        else:
+            p = prep_img("pics/black.jpg")
         res.append({
             "word" :  word[0].decode("utf-8"),
-            "pic"  :  prep_img(word[1]),
+            "pic"  :  p,
             "trans":  u"",
             "guess":  u"",})
     return res
@@ -44,9 +48,6 @@ class HumanPlayer(DummyAI):
         remaining_time = data[0]
         progress_percent = BAR_TICK * remaining_time
 
-    # def process_reset(self, data):
-    #     DummyAI.process_reset(self, data)        
-
     def process_total_time(self, data):
         global TIME
         global BAR_TICK
@@ -55,6 +56,16 @@ class HumanPlayer(DummyAI):
         TIME = data[0]
         BAR_TICK = 100.0 / TIME
         progress_percent = 100
+
+    def process_reset(self, data):
+        global TIME
+        global BAR_TICK
+        global progress_percent
+        DummyAI.process_reset(self, data)
+        TIME = self.state.time
+        BAR_TICK = 100.0 / TIME
+        progress_percent = 100
+        
 
 #constants
 STDFONT = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
@@ -121,7 +132,7 @@ def draw_slots(words, selected_index, offset, margin):
         draw_slot(*args)
         multiplier += 1
 
-def draw_game():
+def draw_game(state):
     global progress_percent
     global remaining_time
     global selected_index
@@ -145,9 +156,9 @@ def draw_game():
         PROGRESS_TEXT.format(str(to_hms(remaining_time))),
         round(progress_percent))    
 
-def game_tick():
+def game_tick(state):
     clock.tick(DESIRED_FPS)
-    draw_game()
+    draw_game(state)
     pygame.display.flip()
 
 #why polling? can't we use twisted for that?
@@ -236,7 +247,7 @@ WORDS = []
 # rem.start(1)
 
 def start_game_loops(p, state):
-    tick = LoopingCall(game_tick)
+    tick = LoopingCall(game_tick, state)
     tick.start(1.0 / DESIRED_FPS)
 
     ev = LoopingCall(process_events, state, p)

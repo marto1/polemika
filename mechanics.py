@@ -17,7 +17,7 @@ from functools import partial
 import string
 
 NUMBER_PLAYERS = 1
-TIME = 30 #seconds
+TIME = 300 #seconds
 
 class Bunch(object):
     def __init__(self, **kwds):
@@ -91,8 +91,8 @@ def equal_words(words, guesses):
     res = []
     for guess in guesses:
         print(words[k][0], end=" ")
-        print(guess)
-        if words[k][0] == guess:
+        print(guess.decode("utf-8"))
+        if words[k][0] == guess.decode("utf-8"):
             res.append(1)
         else:
             res.append(0)
@@ -106,6 +106,8 @@ class GameProtocol(LineReceiver):
     def process_words(self, data): pass
     def process_total_time(self, data): pass
     def process_reset(self, data): pass
+    def process_winner(self, data): pass
+    def process_correct(self, data): pass
 
     def __init__(self, users, state):
         self.state = state
@@ -123,6 +125,8 @@ class GameProtocol(LineReceiver):
             'tick' : self.process_tick,
             'total_time' : self.process_total_time,
             'reset' : self.process_reset,
+            'winner' : self.process_winner,
+            'correct' : self.process_correct,
         }
 
     def lineReceived(self, line):
@@ -214,9 +218,9 @@ class GameProtocol(LineReceiver):
         if all(results):
             self.broadcast(cmd.winner, self.name)
             self.broadcast(cmd.guesses, self.state.comparison_words)
-            self.state.words = random.sample(total_words,
-                                             self.state.total_words)
+            self.state.words = random.sample(self.state.total_words, 5)
             self.broadcast(cmd.reset)
+            self.reset_state()
             self.process_ready([])
         else:
             self.broadcast_rest(cmd.correct, self.name, results)
