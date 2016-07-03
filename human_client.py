@@ -15,6 +15,7 @@ from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.endpoints import connectProtocol
 from mechanics import COMMANDS, cmd, GameProtocol, Bunch
 import random
+#(guesses (("gennem" "pics/thr.png" "through") ("afsløre" "pics/det.jpg" "detect/reveal") ("end" "" "than") ("nøje" "pics/cl.jpg" "closely") ("klart" "pics/cl.jpg" "clearly")))
 
 def to_hms(seconds):
     m, s = divmod(seconds, 60)
@@ -65,7 +66,13 @@ class HumanPlayer(DummyAI):
         TIME = self.state.time
         BAR_TICK = 100.0 / TIME
         progress_percent = 100
-        
+
+    def process_guesses(self, data):
+        k = 0
+        for entry in data[0]:
+            WORDS[k]["trans"] = entry[0].decode("utf-8")
+            k += 1
+        show_correct(WORDS)
 
 #constants
 STDFONT = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"

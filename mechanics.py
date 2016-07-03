@@ -221,7 +221,7 @@ class GameProtocol(LineReceiver):
             self.state.words = random.sample(self.state.total_words, 5)
             self.broadcast(cmd.reset)
             self.reset_state()
-            self.process_ready([])
+            reactor.callLater(3, self.process_ready, [])
         else:
             self.broadcast_rest(cmd.correct, self.name, results)
 
