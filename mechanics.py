@@ -16,7 +16,7 @@ from sexpdata import loads, dumps, Symbol
 from functools import partial
 import string
 
-NUMBER_PLAYERS = 1
+NUMBER_PLAYERS = 2
 TIME = 300 #seconds
 
 class Bunch(object):
@@ -221,7 +221,7 @@ class GameProtocol(LineReceiver):
             self.state.words = random.sample(self.state.total_words, 5)
             self.broadcast(cmd.reset)
             self.reset_state()
-            reactor.callLater(3, self.process_ready, [])
+            reactor.callLater(4, self.process_ready, [])
         else:
             self.broadcast_rest(cmd.correct, self.name, results)
 

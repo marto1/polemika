@@ -74,6 +74,14 @@ class HumanPlayer(DummyAI):
             k += 1
         show_correct(WORDS)
 
+    def process_correct(self, data):
+        global guesses
+        guesses[data[0][0]] = data[0][1]
+
+    def process_players(self, data):
+        global guesses
+        guesses = {x : [0,0,0,0,0] for x in data[0]}
+
 #constants
 STDFONT = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
 PROGRESS_TEXT = " "*60+"Time: {0}"
@@ -98,10 +106,12 @@ t_surface.fill(DEFAULT_TABLE_COLOR)
 t_lb_surface.fill(DEFAULT_TABLE_COLOR)
 pygame.display.set_caption("Fast memory game")
 clock = pygame.time.Clock()
+small_font = pygame.font.Font(STDFONT,14)
 font = pygame.font.Font(STDFONT,20)
 big_font = pygame.font.Font(STDFONT,24)
 progress_percent = 100
 selected_index = 0
+guesses = {}
 TIME = -1
 remaining_time = -1
 
@@ -139,10 +149,36 @@ def draw_slots(words, selected_index, offset, margin):
         draw_slot(*args)
         multiplier += 1
 
+
+def conv_guesses(guess):
+    return " ".join([str(x) for x in guess])
+
+def draw_player(coord, size, name, correct):
+    name_h = round(size[1] * 0.5)
+    guess_h = size[1] - name_h
+    global font
+    global small_font
+    tmp = font
+    font = small_font
+    draw_slot(name, coord, size=(200, name_h))
+    draw_slot(conv_guesses(correct),
+              (coord[0], coord[1] + name_h),
+              size=(200, name_h))
+    font = tmp
+
+def draw_players(players, coord):
+    """[[name, [0, 0, 1, 0]], ...]"""
+    x, y = coord
+    h = 30
+    for player in players.iteritems():
+        draw_player((x, y), (150, h), player[0], player[1])
+        y += h + 10
+
 def draw_game(state):
     global progress_percent
     global remaining_time
     global selected_index
+    global guesses
     w,h = font.size("FPS:        ")
     margin = 35
     surface.blit(pygame.transform.scale(t_surface,(w,h)),
@@ -158,6 +194,9 @@ def draw_game(state):
                 WORDS[selected_index]['pic'],
                 (SCREEN_WIDTH-260, 20+margin))
 
+    draw_players(
+        guesses,
+        (SCREEN_WIDTH-260, 200+margin))
     #TODO make progress bar smooth
     draw_progressbar(
         PROGRESS_TEXT.format(str(to_hms(remaining_time))),
