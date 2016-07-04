@@ -76,10 +76,11 @@ class HumanPlayer(DummyAI):
 
     def process_correct(self, data):
         global guesses
-        guesses[data[0][0]] = data[0][1]
+        guesses[data[0]] = data[1]
 
     def process_players(self, data):
         global guesses
+        
         guesses = {x : [0,0,0,0,0] for x in data[0]}
 
 #constants
