@@ -108,6 +108,7 @@ class GameProtocol(LineReceiver):
     def process_reset(self, data): pass
     def process_winner(self, data): pass
     def process_correct(self, data): pass
+    def process_disconnected(self, data): pass
 
     def __init__(self, users, state):
         self.state = state
@@ -127,6 +128,7 @@ class GameProtocol(LineReceiver):
             'reset' : self.process_reset,
             'winner' : self.process_winner,
             'correct' : self.process_correct,
+            'disconnected' : self.process_disconnected,
         }
 
     def lineReceived(self, line):

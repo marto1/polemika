@@ -4,7 +4,6 @@ from twisted.internet import reactor, protocol, task
 from twisted.internet import fdesc, defer, error
 import pygame
 from datetime import datetime, date
-
 import pygame,random,math
 from pygame.locals import *
 from random import randint
@@ -15,7 +14,6 @@ from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.endpoints import connectProtocol
 from mechanics import COMMANDS, cmd, GameProtocol, Bunch
 import random
-#(guesses (("gennem" "pics/thr.png" "through") ("afsløre" "pics/det.jpg" "detect/reveal") ("end" "" "than") ("nøje" "pics/cl.jpg" "closely") ("klart" "pics/cl.jpg" "clearly")))
 
 def to_hms(seconds):
     m, s = divmod(seconds, 60)
@@ -62,10 +60,12 @@ class HumanPlayer(DummyAI):
         global TIME
         global BAR_TICK
         global progress_percent
+        global guesses
         DummyAI.process_reset(self, data)
         TIME = self.state.time
         BAR_TICK = 100.0 / TIME
         progress_percent = 100
+        guesses = {k : [0,0,0,0,0] for k in guesses.keys()}
 
     def process_guesses(self, data):
         k = 0
@@ -80,7 +80,6 @@ class HumanPlayer(DummyAI):
 
     def process_players(self, data):
         global guesses
-        
         guesses = {x : [0,0,0,0,0] for x in data[0]}
 
 #constants

@@ -7,7 +7,8 @@ from twisted.internet import fdesc, defer, error
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from datetime import datetime, date
 from twisted.internet.protocol import Factory
-from twisted.internet.endpoints import TCP4ClientEndpoint, connectProtocol
+from twisted.internet.endpoints import TCP4ClientEndpoint
+from twisted.internet.endpoints import connectProtocol
 import random
 from mechanics import COMMANDS, cmd, GameProtocol, Bunch
 
@@ -15,6 +16,7 @@ class DummyAI(GameProtocol):
 
     letter_pool=u'abcdefghijklmnopqrstuvwxyzøåæ'
     longest_word = 9
+    step = 0.5
 
     def choose_word(self, word):
         lw = self.longest_word
@@ -35,7 +37,7 @@ class DummyAI(GameProtocol):
     def process_words(self, data):
         self.state.words = data[0]
         self.state.guess = LoopingCall(self.make_guesses)
-        self.state.guess.start(0.5)
+        self.state.guess.start(self.step)
 
     def process_total_time(self, data):
         self.state.time = data[0]
@@ -57,9 +59,9 @@ class DummyAI(GameProtocol):
     def make_guesses(self):
         if self.state.remaining_time == 0: return
         if self.state.phase == "over": return
-        self.write(cmd.guesses, self.translate())
+        self.write(cmd.guesses, self.dump_guess())
 
-    def translate(self):
+    def dump_guess(self):
         l = lambda x: self.choose_word(x)
         res = [l(w) for w in self.state.words]
         return res
