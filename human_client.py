@@ -287,11 +287,6 @@ def reset_game():
 
 
 WORDS = []
-
-
-# rem = LoopingCall(countdown_remaining_time)
-# rem.start(1)
-
 def start_game_loops(p, state):
     tick = LoopingCall(game_tick, state)
     tick.start(1.0 / DESIRED_FPS)

@@ -14,10 +14,11 @@ from copy import copy
 import random
 from sexpdata import loads, dumps, Symbol
 from functools import partial
+from sys import argv
 import string
 
 NUMBER_PLAYERS = 2
-TIME = 300 #seconds
+TIME = 30 #seconds
 
 class Bunch(object):
     def __init__(self, **kwds):
@@ -202,7 +203,7 @@ class GameProtocol(LineReceiver):
                 lambda: self.broadcast(
                     cmd.tick,
                     self.state.remaining_time))
-            self.state.tick.start(3)
+            self.state.tick.start(1)
 
     def countdown(self):
         timer = countdown_task(self.state)
@@ -211,9 +212,11 @@ class GameProtocol(LineReceiver):
 
     def check_for_timeout(self, res):
         if self.state.phase == "timeout":
+            self.broadcast(cmd.guesses, self.state.comparison_words)
+            self.state.words = random.sample(self.state.total_words, 5)
             self.broadcast(cmd.reset)
             self.reset_state()
-            self.process_ready([])
+            reactor.callLater(4, self.process_ready, [])
 
     def process_guesses(self, data):
         results = equal_words(self.state.comparison_words, data[0])
@@ -230,11 +233,11 @@ class GameProtocol(LineReceiver):
     def process_errors(self, data):
         print('error received: {0}'.format(data))
 
-
 class GameFactory(Factory):
 
     def __init__(self):
-        data = read_whole_dict("words") #FIXME blocks
+        global DICT
+        data = read_whole_dict(DICT) #FIXME blocks
         total_words = process_dict(data)
         self.state = Bunch()
         self.state.total_words = total_words
@@ -251,5 +254,9 @@ class GameFactory(Factory):
         return GameProtocol(self.users, self.state)
 
 if __name__ == '__main__':
+    if len(argv) > 1:
+        DICT = argv[1]
+    else:    
+        DICT = "words"
     reactor.listenTCP(9022, GameFactory())
     reactor.run()
