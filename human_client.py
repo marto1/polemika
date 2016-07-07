@@ -15,6 +15,8 @@ from twisted.internet.endpoints import connectProtocol
 from mechanics import COMMANDS, cmd, GameProtocol, Bunch
 import random
 
+from gui import draw_slot, draw_inputbox, draw_slot_text
+
 def to_hms(seconds):
     m, s = divmod(seconds, 60)
     h, m = divmod(m, 60)
@@ -123,18 +125,13 @@ prep_img = lambda x: pygame.transform.scale(
 def draw_text(message,pos,color=(255,255,255)):
     surface.blit(font.render(message,1,color),pos)
 
-def draw_slot(message, pos, color=(128,128,128), size=(500, 21)):
-    slot_surface = pygame.Surface(size, pygame.SRCALPHA)
-    slot_surface.fill(color)
-    surface.blit(slot_surface, pos)
-    draw_text(message, pos)
-
 def draw_progressbar(message, progress):
     """progress from 0 to 100"""
     total = SCREEN_WIDTH-50
     progressw = int((total/100.0)*(100-progress))
-    draw_slot("", (20, 420), size=(total, 70))
-    draw_slot(message, (20, 420), (0, 128, 233), (total-progressw, 70))
+    draw_slot(surface, (20, 420), font, size=(total, 70))
+    draw_slot_text(surface, message, (20, 420), font,
+                   (0, 128, 233), (total-progressw, 70))
 
 
 def draw_slots(words, selected_index, offset, margin):
@@ -142,11 +139,14 @@ def draw_slots(words, selected_index, offset, margin):
     multiplier=1
     for word in words:
         args = [
+            surface,
             word["word"] + "   " + word["guess"],
-            (offset[0],offset[1]+margin*multiplier)]
+            (offset[0],offset[1]+margin*multiplier),
+            font,
+        ]
         if selected_index == (multiplier-1):
             args.append(SELECTED)
-        draw_slot(*args)
+        draw_inputbox(*args)
         multiplier += 1
 
 
@@ -160,10 +160,13 @@ def draw_player(coord, size, name, correct):
     global small_font
     tmp = font
     font = small_font
-    draw_slot(name, coord, size=(200, name_h))
-    draw_slot(conv_guesses(correct),
-              (coord[0], coord[1] + name_h),
-              size=(200, name_h))
+    draw_slot_text(surface, name, coord, font, size=(200, name_h))
+    draw_slot_text(
+        surface,
+        conv_guesses(correct),
+        (coord[0], coord[1] + name_h),
+        font,
+        size=(200, name_h))
     font = tmp
 
 def draw_players(players, coord):
@@ -179,8 +182,10 @@ def draw_game(state):
     global remaining_time
     global selected_index
     global guesses
+    global testinput
     w,h = font.size("FPS:        ")
     margin = 35
+    #
     surface.blit(pygame.transform.scale(t_surface,(w,h)),
                  (8,SCREEN_HEIGHT-30))
     surface.blit(t_lb_surface,(0,0))
@@ -200,7 +205,7 @@ def draw_game(state):
     #TODO make progress bar smooth
     draw_progressbar(
         PROGRESS_TEXT.format(str(to_hms(remaining_time))),
-        round(progress_percent))    
+        round(progress_percent))
 
 def game_tick(state):
     clock.tick(DESIRED_FPS)
