@@ -47,7 +47,7 @@ class HumanPlayer(DummyAI):
         global progress_percent
         self.state.remaining_time = data[0]
         remaining_time = data[0]
-        progress_percent = BAR_TICK * remaining_time
+        progress_percent = 100#BAR_TICK * remaining_time
 
     def process_total_time(self, data):
         global TIME
@@ -89,6 +89,9 @@ STDFONT = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
 PROGRESS_TEXT = " "*60+"Time: {0}"
 SELECTED = (128, 0, 100)
 UNSELECTED = (128,128,128)
+CORRECT_BOX = (0,10,255)
+NOT_CORRECT_BOX = (255,10,0)
+KANT_COLOR = (96, 96, 96)
 DESIRED_FPS = 60.0
 SCREEN_WIDTH, SCREEN_HEIGHT = (800,600)
 DEFAULT_TABLE_COLOR = (50,50,50,80)
@@ -149,6 +152,36 @@ def draw_slots(words, selected_index, offset, margin):
         draw_inputbox(*args)
         multiplier += 1
 
+def draw_player_correct_box(surface, value, coord, size):
+    """Draw a correct box"""
+    m = 2
+    kant_box = pygame.Surface((size[0]+m, size[1]+m),pygame.SRCALPHA)
+    box = pygame.Surface((size[0]-m, size[1]-m),pygame.SRCALPHA)
+    kant_box.fill(KANT_COLOR)
+    if value == 0:
+        box.fill(NOT_CORRECT_BOX)
+    elif value == 1:
+        box.fill(CORRECT_BOX)
+    else:
+        raise ValueError("Correct box not 0/1")
+    surface.blit(kant_box, coord)
+    surface.blit(box, (coord[0]+m, coord[1]+m))
+    
+
+def draw_player_correct_bar(surface, correct, coord, size):
+    """
+    Draws CORRECT/NOT CORRECT labels for other players
+    playing the game.
+    """
+    #draw_player_correct_box
+    x, y = coord
+    w, h = size
+    off = 0
+    box_w = 20
+    for val in correct:
+        draw_player_correct_box(surface, val, (x+off, y), (box_w, 20))
+        off += box_w
+
 
 def conv_guesses(guess):
     return " ".join([str(x) for x in guess])
@@ -161,13 +194,19 @@ def draw_player(coord, size, name, correct):
     tmp = font
     font = small_font
     draw_slot_text(surface, name, coord, font, size=(200, name_h))
-    draw_slot_text(
+    draw_player_correct_bar(
         surface,
-        conv_guesses(correct),
+        correct,
         (coord[0], coord[1] + name_h),
-        font,
-        size=(200, name_h))
+        (200, name_h))
+    # draw_slot_text(
+    #     surface,
+    #     conv_guesses(correct),
+    #     (coord[0], coord[1] + name_h),
+    #     font,
+    #     size=(200, name_h))
     font = tmp
+    
 
 def draw_players(players, coord):
     """[[name, [0, 0, 1, 0]], ...]"""
@@ -206,6 +245,8 @@ def draw_game(state):
     draw_progressbar(
         PROGRESS_TEXT.format(str(to_hms(remaining_time))),
         round(progress_percent))
+    if progress_percent >= 1.66: #FIXME TOTAL_PERCENT / FPS = 1.66
+        progress_percent -= 1.66
 
 def game_tick(state):
     clock.tick(DESIRED_FPS)
