@@ -42,6 +42,7 @@ class HumanPlayer(DummyAI):
         global WORDS
         WORDS = convert_to_dict(data[0])
         self.state.words = WORDS
+        self.state.block_input = False
 
     def process_tick(self, data):
         global remaining_time
@@ -73,6 +74,7 @@ class HumanPlayer(DummyAI):
         self.state.progress_percent = 100
         self.state.guesses = {k : [0,0,0,0,0] for k in guesses.keys()}
         guesses = {k : [0,0,0,0,0] for k in guesses.keys()}
+        self.state.block_input = True
 
     def process_guesses(self, data):
         k = 0
@@ -258,6 +260,8 @@ def game_tick(state):
 
 #why polling? can't we use twisted for that?
 def process_events(state, p):
+    if state.block_input:
+        return
     keys = pygame.key.get_pressed()
     if keys[pygame.K_BACKSPACE]:
         w = WORDS[state.selected_index]["guess"]
@@ -347,6 +351,7 @@ def reset_human_client_state(state):
     state.progress_percent = 100
     state.selected_index = 0
     state.guesses = {}
+    state.block_input = False
     return state
 
 if __name__ == '__main__':
