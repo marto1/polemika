@@ -2,10 +2,12 @@
 GUI elements.
 """
 
+['__class__', '__coerce__', '__copy__', '__delattr__', '__delitem__', '__delslice__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__getslice__', '__gt__', '__hash__', '__init__', '__le__', '__len__', '__lt__', '__ne__', '__new__', '__nonzero__', '__reduce__', '__reduce_ex__', '__repr__', '__safe_for_unpickling__', '__setattr__', '__setitem__', '__setslice__', '__sizeof__', '__str__', '__subclasshook__', 'bottom', 'bottomleft', 'bottomright', 'center', 'centerx', 'centery', 'clamp', 'clamp_ip', 'clip', 'collidedict', 'collidedictall', 'collidelist', 'collidelistall', 'collidepoint', 'colliderect', 'contains', 'copy', 'fit', 'h', 'height', 'inflate', 'inflate_ip', 'left', 'midbottom', 'midleft', 'midright', 'midtop', 'move', 'move_ip', 'normalize', 'right', 'size', 'top', 'topleft', 'topright', 'union', 'union_ip', 'unionall', 'unionall_ip', 'w', 'width', 'x', 'y']
+
 import pygame
 
 def render_text(surface, message, pos, font, color=(255,255,255)):
-    surface.blit(font.render(message,1,color),pos)
+    return surface.blit(font.render(message,1,color),pos)
 
 def draw_slot(
         surface,
@@ -15,7 +17,7 @@ def draw_slot(
         size=(500, 21)):
     slot_surface = pygame.Surface(size, pygame.SRCALPHA)
     slot_surface.fill(color)
-    surface.blit(slot_surface, pos)
+    return surface.blit(slot_surface, pos)
 
 def draw_slot_text(
         surface,
@@ -25,7 +27,7 @@ def draw_slot_text(
         color=(100,100,100),
         size=(500, 21)):
     draw_slot(surface, pos, font, color, size)
-    render_text(surface, message, pos, font)
+    return render_text(surface, message, pos, font)
 
 def draw_inputbox(
         surface,
@@ -45,6 +47,13 @@ def draw_inputbox(
                           pygame.SRCALPHA)
     slot.fill(color)
     surface.blit(slot, (pos[0]+thick, pos[1]+thick))
-    
-    render_text(surface, message, (pos[0]+thick+2, pos[1]+thick+2), font)
+    r = render_text(
+        surface,
+        message,
+        (pos[0]+thick+2, pos[1]+thick+2),
+        font)
+    if focused:
+        cursor = pygame.Surface((3, size[1]-thick*3), pygame.SRCALPHA)
+        cursor.fill((48, 48, 48))
+        surface.blit(cursor, r.topright)
 

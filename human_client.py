@@ -100,7 +100,6 @@ DEFEAT_TABLE_COLOR = (180,0,0,80)
 time_total_seconds = lambda tm: tm.hour*60*60 + tm.minute*60 + tm.second
 BAR_TICK = 0
 
-
 pygame.init()
 
 #global vars
@@ -146,6 +145,9 @@ def draw_slots(words, selected_index, offset, margin):
             word["word"] + "   " + word["guess"],
             (offset[0],offset[1]+margin*multiplier),
             font,
+            (100,100,100),
+            (128,128,128),
+            (500, 36),
         ]
         if selected_index == (multiplier-1):
             args.append(SELECTED)
@@ -199,12 +201,6 @@ def draw_player(coord, size, name, correct):
         correct,
         (coord[0], coord[1] + name_h),
         (200, name_h))
-    # draw_slot_text(
-    #     surface,
-    #     conv_guesses(correct),
-    #     (coord[0], coord[1] + name_h),
-    #     font,
-    #     size=(200, name_h))
     font = tmp
     
 
