@@ -56,4 +56,3 @@ def draw_inputbox(
         cursor = pygame.Surface((3, size[1]-thick*3), pygame.SRCALPHA)
         cursor.fill((48, 48, 48))
         surface.blit(cursor, r.topright)
-

@@ -41,19 +41,22 @@ class HumanPlayer(DummyAI):
     def process_words(self, data):
         global WORDS
         WORDS = convert_to_dict(data[0])
+        self.state.words = WORDS
 
     def process_tick(self, data):
         global remaining_time
         global progress_percent
         self.state.remaining_time = data[0]
+        self.state.progress_percent = 100
         remaining_time = data[0]
-        progress_percent = 100#BAR_TICK * remaining_time
+        progress_percent = 100 #BAR_TICK * remaining_time
 
     def process_total_time(self, data):
         global TIME
         global BAR_TICK
         global progress_percent
         self.state.time = data[0]
+        self.state.progress_percent = 100
         TIME = data[0]
         BAR_TICK = 100.0 / TIME
         progress_percent = 100
@@ -67,22 +70,28 @@ class HumanPlayer(DummyAI):
         TIME = self.state.time
         BAR_TICK = 100.0 / TIME
         progress_percent = 100
+        self.state.progress_percent = 100
+        self.state.guesses = {k : [0,0,0,0,0] for k in guesses.keys()}
         guesses = {k : [0,0,0,0,0] for k in guesses.keys()}
 
     def process_guesses(self, data):
         k = 0
         for entry in data[0]:
             WORDS[k]["trans"] = entry[0].decode("utf-8")
+            self.state.words[k]["trans"] = entry[0].decode("utf-8")
             k += 1
         show_correct(WORDS)
+        #show_correct(self.state.words)
 
     def process_correct(self, data):
         global guesses
         guesses[data[0]] = data[1]
+        self.state.guesses[data[0]] = data[1]
 
     def process_players(self, data):
         global guesses
         guesses = {x : [0,0,0,0,0] for x in data[0]}
+        self.state.guesses = {x : [0,0,0,0,0] for x in data[0]}
 
 #constants
 STDFONT = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
@@ -142,7 +151,7 @@ def draw_slots(words, selected_index, offset, margin):
     for word in words:
         args = [
             surface,
-            word["word"] + "   " + word["guess"],
+            word["word"] + u"  • " + word["guess"],
             (offset[0],offset[1]+margin*multiplier),
             font,
             (100,100,100),
@@ -276,7 +285,7 @@ def process_events(state, p):
 
 def show_correct(words):
     for word in words:
-        word["guess"] += " " + word["trans"]
+        word["guess"] += u"  •  " + word["trans"]
 
 def countdown_remaining_time():
     global remaining_time
@@ -341,6 +350,8 @@ if __name__ == '__main__':
     point = TCP4ClientEndpoint(reactor, "localhost", 9022)
     state = Bunch()
     reset_state(state)
+    state.progress_percent = 100
+    state.guesses = {}
     d = connectProtocol(point, HumanPlayer({}, state))
     d.addCallback(write_on_connection)
     d.addCallback(start_game_loops, state)
