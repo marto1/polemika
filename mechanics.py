@@ -102,35 +102,19 @@ def equal_words(words, guesses):
 
 class GameProtocol(LineReceiver):
 
-    def process_tick(self, data): pass
-    def process_players(self, data): pass
-    def process_words(self, data): pass
-    def process_total_time(self, data): pass
-    def process_reset(self, data): pass
-    def process_winner(self, data): pass
-    def process_correct(self, data): pass
-    def process_disconnected(self, data): pass
-
     def __init__(self, users, state):
         self.state = state
         self.users = users
         self.name = rstr(20)
         self.users[self.name] = self
-        self.phase = "initial"
-        #FIXME map with COMMANDS
-        self.handlers = {
-            'ready': self.process_ready,
-            'guesses': self.process_guesses,
-            'error' : self.process_errors,
-            'players' : self.process_players,
-            'words' : self.process_words,
-            'tick' : self.process_tick,
-            'total_time' : self.process_total_time,
-            'reset' : self.process_reset,
-            'winner' : self.process_winner,
-            'correct' : self.process_correct,
-            'disconnected' : self.process_disconnected,
-        }
+        self.phase = "initial"        
+        self.handlers = {}
+        for k in COMMANDS.keys():
+            mname = 'process_{0}'.format(k)
+            if getattr(self, mname, None) == None:
+                setattr(self, mname, lambda x: x)
+            self.handlers[k] = getattr(self, mname)
+
 
     def lineReceived(self, line):
         print("RAW:" + line)
@@ -146,7 +130,7 @@ class GameProtocol(LineReceiver):
                 self.error(13, "First element is not a symbol")
                 return
             if rdata[0].value() in self.handlers:
-                self.handlers[rdata[0].value()](rdata[1:])
+                 self.handlers[rdata[0].value()](rdata[1:])
             else:
                 self.error(11, "Unrecognized command")
 
