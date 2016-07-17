@@ -123,7 +123,6 @@ small_font = pygame.font.Font(STDFONT,14)
 font = pygame.font.Font(STDFONT,20)
 big_font = pygame.font.Font(STDFONT,24)
 progress_percent = 100
-selected_index = 0
 guesses = {}
 TIME = -1
 remaining_time = -1
@@ -224,7 +223,6 @@ def draw_players(players, coord):
 def draw_game(state):
     global progress_percent
     global remaining_time
-    global selected_index
     global guesses
     global testinput
     w,h = font.size("FPS:        ")
@@ -236,11 +234,11 @@ def draw_game(state):
     draw_text("FPS: " + str(int(clock.get_fps())),(10,SCREEN_HEIGHT-30))
     surface.blit(big_font.render("Guess words",0,
                                  (255,255,255)),(SCREEN_WIDTH/2.5,20))
-    draw_slots(WORDS, selected_index, (30,20), 35)
+    draw_slots(WORDS, state.selected_index, (30,20), 35)
     if len(WORDS) > 0:
-        if WORDS[selected_index]['pic']:
+        if WORDS[state.selected_index]['pic']:
             surface.blit(
-                WORDS[selected_index]['pic'],
+                WORDS[state.selected_index]['pic'],
                 (SCREEN_WIDTH-260, 20+margin))
 
     draw_players(
@@ -260,28 +258,27 @@ def game_tick(state):
 
 #why polling? can't we use twisted for that?
 def process_events(state, p):
-    global selected_index
     keys = pygame.key.get_pressed()
     if keys[pygame.K_BACKSPACE]:
-        w = WORDS[selected_index]["guess"]
-        WORDS[selected_index]["guess"] = w[:-1]
+        w = WORDS[state.selected_index]["guess"]
+        WORDS[state.selected_index]["guess"] = w[:-1]
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             reactor.stop()
         elif event.type == pygame.KEYDOWN:
             if event.key in [pygame.K_DOWN, pygame.K_TAB]:
-                selected_index += 1
-                if selected_index >= len(WORDS):
-                    selected_index = 0
+                state.selected_index += 1
+                if state.selected_index >= len(WORDS):
+                    state.selected_index = 0
             elif event.key == pygame.K_UP:
-                selected_index -= 1
-                if selected_index < 0:
-                    selected_index = len(WORDS) - 1
+                state.selected_index -= 1
+                if state.selected_index < 0:
+                    state.selected_index = len(WORDS) - 1
             elif event.key == pygame.K_RETURN:
                 p.write(cmd.guesses, [x['guess'] for x in WORDS])
             else: #assume text input
                 if len(WORDS) > 0:
-                    WORDS[selected_index]["guess"] += event.unicode
+                    WORDS[state.selected_index]["guess"] += event.unicode
 
 def show_correct(words):
     for word in words:
@@ -346,12 +343,17 @@ def start_game_loops(p, state):
     ev.start(1.0 / 30)
     return p
 
+def reset_human_client_state(state):
+    state.progress_percent = 100
+    state.selected_index = 0
+    state.guesses = {}
+    return state
+
 if __name__ == '__main__':
     point = TCP4ClientEndpoint(reactor, "localhost", 9022)
     state = Bunch()
     reset_state(state)
-    state.progress_percent = 100
-    state.guesses = {}
+    reset_human_client_state(state)
     d = connectProtocol(point, HumanPlayer({}, state))
     d.addCallback(write_on_connection)
     d.addCallback(start_game_loops, state)

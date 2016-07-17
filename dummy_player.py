@@ -79,6 +79,7 @@ def reset_state(state):
     state.guess = None
     state.time = -1
     state.remaining_time = -1
+    return state
 
 if __name__ == '__main__':
     point = TCP4ClientEndpoint(reactor, "localhost", 9022)
