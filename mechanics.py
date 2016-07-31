@@ -58,10 +58,13 @@ def process_line(line):
     img = ""
     if len(raw) == 3:
         img = raw[2]
-    return {
-        "word" :  raw[1].decode("utf-8"),
-        "pic"  :  img,
-        "trans":  raw[0].decode("utf-8"),}
+    try:
+        return {
+            "word" :  raw[1].decode("utf-8"),
+            "pic"  :  img,
+            "trans":  raw[0].decode("utf-8"),}
+    except Exception:
+        raise ValueError(u"Bad line:{0}".format(raw))
 
 def process_dict(data):
     return [process_line(line) for line in data]
