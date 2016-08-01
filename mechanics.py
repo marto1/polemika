@@ -215,7 +215,7 @@ class GameProtocol(LineReceiver):
             self.reset_state()
             reactor.callLater(4, self.process_ready, [])
         else:
-            self.broadcast_rest(cmd.correct, self.name, results)
+            self.broadcast(cmd.correct, self.name, results)
 
     def process_errors(self, data):
         print('error received: {0}'.format(data))
