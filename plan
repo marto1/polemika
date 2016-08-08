@@ -10,7 +10,22 @@
 ** learning about pronunciation principles will make remembering
    and understanding easier 
 * Sentences - news articles
-Fill in words. Scenario for a diferrent gameplay style.
+** overview
+   Fill in words. Scenario for a diferrent gameplay style.
+   For example:
+
+   Flere unge har _søgt ind på en _videregående uddannelse inden for
+   datalogi og it, men det er ikke nok til at _imødekomme den
+   efterspørgsel på _arbejdskraft inden for faget, som
+   it-brancheorganisationerne _forventer.
+
+   src. https://www.version2.dk/artikel/stadig-brug-mange-flere-it-uddannede-trods-oeget-optag-878438
+
+   There is a news article that will have empty spots that the players must fill
+   for a given time with visual guidance. 
+** format
+   Raw text with underline followed by the word where the text will be.
+   
 
 * game protocol
 ** logic resides in server
