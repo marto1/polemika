@@ -17,9 +17,10 @@ from functools import partial
 from sys import argv
 import string
 import logging
+import sys
 
 fmt = '%(asctime)s %(levelname)s::%(message)s'
-logging.basicConfig(level=logging.DEBUG, format=fmt)
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=fmt)
 
 
 NUMBER_PLAYERS = 2
