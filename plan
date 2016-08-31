@@ -26,6 +26,8 @@
 ** format
    Raw text with underline followed by the word where the text will be.
    
+* grammar sentences
+* game log
 
 * game protocol
 ** logic resides in server

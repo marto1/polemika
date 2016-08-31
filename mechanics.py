@@ -16,6 +16,11 @@ from sexpdata import loads, dumps, Symbol
 from functools import partial
 from sys import argv
 import string
+import logging
+
+fmt = '%(asctime)s %(levelname)s::%(message)s'
+logging.basicConfig(level=logging.DEBUG, format=fmt)
+
 
 NUMBER_PLAYERS = 2
 TIME = 30 #seconds
@@ -76,7 +81,6 @@ def countdown_remaining_time(x=None, state=None):
     return state.remaining_time
 
 def reset_game(x=None, state=None):
-    print(x)
     if x == -1: state.phase = "timeout"
     return x
 
@@ -94,8 +98,7 @@ def equal_words(words, guesses):
     k = 0
     res = []
     for guess in guesses:
-        print(words[k][0], end=" ")
-        print(guess.decode("utf-8"))
+        #logging.debug(str(words[k][0]) + guess.decode("utf-8"))
         if words[k][0] == guess.decode("utf-8"):
             res.append(1)
         else:
@@ -120,7 +123,7 @@ class GameProtocol(LineReceiver):
 
 
     def lineReceived(self, line):
-        print("RAW:" + line)
+        logging.debug("RCVD::" + line)
         try:
             rdata = loads(line)
         except Exception:
@@ -160,6 +163,8 @@ class GameProtocol(LineReceiver):
         self.write(cmd.error, code, message)
 
     def broadcast(self, func, *args):
+        #FIXME refactor too many func(*args) calls
+        logging.info("BRCAST::"+func(*args))
         for user in self.users.values():
             GameProtocol.write(user, func, *args)
 
@@ -181,7 +186,7 @@ class GameProtocol(LineReceiver):
             self.broadcast(cmd.total_time, self.state.time)
             self.broadcast(cmd.players, self.users.keys())
             self.state.comparison_words = tuple(tuple(x.values()) for x in self.state.words)
-            print(self.state.comparison_words)
+            #print(self.state.comparison_words)
             w = tuple((x[2], x[1]) for x in self.state.comparison_words)
             self.broadcast(cmd.words, w)
             self.state.rem = LoopingCall(self.countdown)
