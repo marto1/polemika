@@ -12,9 +12,9 @@ class MomentAI(DummyAI):
 
     direct_pool = {}
     blurry_pool = {}
-    max_direct = 5
-    max_blurry = 40
-    chance_blurry = 60 #1-100; 100 always
+    max_direct = 10
+    max_blurry = 50
+    chance_blurry = 65 #1-100; 100 always
     transfer_tresh = 3 #transfer to direct pool on treshhold
 
     def remember(self, word):

@@ -28,6 +28,16 @@
    
 * grammar sentences
 * game log
+* fallout style hacking game with new words
+** SRVMSG: (players ("0x11111" "0x123211" "0x12222")) list of players 
+** SRVMSG: (words ("letter1" "letter2")) - raw lines fed by the server
+** CLTMSG: (guesses ("word")) - client guess
+** SRVMSG: (winner "0x123211") ; (winner "0x0") - winner is 0x123211 or winner is 0x0
+** SRVMSG: (guesses ("word")) - server sends back correct letters
+** SRVMSG: (correct "0x123211" 3) - 3 of the letters are correct
+** SRVMSG: (total_time 4200) - the total time of the game is 4200 seconds
+** SRVMSG: (tick 3) - server sends master tick at 3. Ticks countdown 
+** SRVMSG: (reset) - server resets internal states to initial ones.
 
 * game protocol
 ** logic resides in server
