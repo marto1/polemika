@@ -228,16 +228,16 @@ class GameProtocol(LineReceiver):
 
 class GameFactory(Factory):
 
-    def __init__(self):
+    def __init__(self, number=NUMBER_PLAYERS, tim=TIME):
         global DICT
         data = read_whole_dict(DICT) #FIXME blocks
         total_words = process_dict(data)
         self.state = Bunch()
         self.state.total_words = total_words
         self.state.words = random.sample(total_words, 5)
-        self.state.time = TIME
-        self.state.remaining_time = TIME
-        self.state.number_players = NUMBER_PLAYERS
+        self.state.time = tim
+        self.state.remaining_time = tim
+        self.state.number_players = number
         self.state.phase = "initial"
         self.state.rem = None
         self.state.tick = None
