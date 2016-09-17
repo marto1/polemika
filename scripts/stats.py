@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from sys import argv
 from sexpdata import loads, dumps, Symbol
 
@@ -61,5 +63,3 @@ def main(filename):
 
 if __name__ == '__main__':
     main(argv[1])
-        
-

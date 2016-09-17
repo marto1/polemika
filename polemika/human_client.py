@@ -132,18 +132,20 @@ remaining_time = -1
 
 prep_img = lambda x: pygame.transform.scale(
     pygame.image.load(x),
-    (250, 150))
+    (500, 200))
 
 def draw_text(message,pos,color=(255,255,255)):
     surface.blit(font.render(message,1,color),pos)
 
 def draw_progressbar(message, progress):
     """progress from 0 to 100"""
-    total = SCREEN_WIDTH-50
+    total = SCREEN_WIDTH-300
+    dim = (150, 420)
+    h = 40
     progressw = int((total/100.0)*(100-progress))
-    draw_slot(surface, (20, 420), font, size=(total, 70))
-    draw_slot_text(surface, message, (20, 420), font,
-                   (0, 128, 233), (total-progressw, 70))
+    draw_slot(surface, dim, font, size=(total, h))
+    draw_slot_text(surface, message, (150, 420), font,
+                   (0, 128, 233), (total-progressw, h))
 
 
 def draw_slots(words, selected_index, offset, margin):
@@ -189,9 +191,9 @@ def draw_player_correct_bar(surface, correct, coord, size):
     x, y = coord
     w, h = size
     off = 0
-    box_w = 20
+    box_w = 39.9 #why?
     for val in correct:
-        draw_player_correct_box(surface, val, (x+off, y), (box_w, 20))
+        draw_player_correct_box(surface, val, (x+off, y), (box_w, 10))
         off += box_w
 
 
@@ -229,24 +231,20 @@ def draw_game(state):
     global testinput
     w,h = font.size("FPS:        ")
     margin = 35
-    #
     surface.blit(pygame.transform.scale(t_surface,(w,h)),
                  (8,SCREEN_HEIGHT-30))
     surface.blit(t_lb_surface,(0,0))
     draw_text("FPS: " + str(int(clock.get_fps())),(10,SCREEN_HEIGHT-30))
-    surface.blit(big_font.render("Guess words",0,
-                                 (255,255,255)),(SCREEN_WIDTH/2.5,20))
-    draw_slots(WORDS, state.selected_index, (30,20), 35)
+    draw_slots(WORDS, state.selected_index, (150,200), 35)
     if len(WORDS) > 0:
         if WORDS[state.selected_index]['pic']:
             surface.blit(
                 WORDS[state.selected_index]['pic'],
-                (SCREEN_WIDTH-260, 20+margin))
+                (150, margin))
 
     draw_players(
         guesses,
-        (SCREEN_WIDTH-260, 200+margin))
-    #TODO make progress bar smooth
+        (150, 460+margin))
     draw_progressbar(
         PROGRESS_TEXT.format(str(to_hms(remaining_time))),
         round(progress_percent))
