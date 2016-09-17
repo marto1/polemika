@@ -97,7 +97,7 @@ class HumanPlayer(DummyAI):
 
 #constants
 STDFONT = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
-PROGRESS_TEXT = " "*60+"Time: {0}"
+PROGRESS_TEXT = "Time: {0}"
 SELECTED = (128, 0, 100)
 UNSELECTED = (128,128,128)
 CORRECT_BOX = (0,10,255)
@@ -115,8 +115,8 @@ pygame.init()
 
 #global vars
 surface = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
-t_surface = pygame.Surface((SCREEN_WIDTH,25),pygame.SRCALPHA)
-t_lb_surface = pygame.Surface((SCREEN_WIDTH,400),pygame.SRCALPHA)
+t_surface = pygame.Surface((SCREEN_WIDTH,25), pygame.SRCALPHA)
+t_lb_surface = pygame.Surface((SCREEN_WIDTH,442), pygame.SRCALPHA)
 t_surface.fill(DEFAULT_TABLE_COLOR)
 t_lb_surface.fill(DEFAULT_TABLE_COLOR)
 pygame.display.set_caption("Fast memory game")
@@ -132,20 +132,28 @@ remaining_time = -1
 
 prep_img = lambda x: pygame.transform.scale(
     pygame.image.load(x),
-    (500, 200))
+    (500, 225))
 
 def draw_text(message,pos,color=(255,255,255)):
     surface.blit(font.render(message,1,color),pos)
 
-def draw_progressbar(message, progress):
-    """progress from 0 to 100"""
-    total = SCREEN_WIDTH-300
-    dim = (150, 420)
-    h = 40
+def draw_progressbar(
+        progress,
+        coord,
+        size=(100, 401),
+        reverse=False,
+        c1=(0, 128, 233),
+        c2=(100,100,100)):
+    """
+    progress from 0 to 100.
+    reversed direction 
+    """
+    total = size[0]
     progressw = int((total/100.0)*(100-progress))
-    draw_slot(surface, dim, font, size=(total, h))
-    draw_slot_text(surface, message, (150, 420), font,
-                   (0, 128, 233), (total-progressw, h))
+    prog_w = total-progressw if not reverse else total-100+progressw
+    draw_slot(surface, coord, font, c2, size=size)
+    draw_slot(surface, coord, font,
+              c1, (prog_w, size[1]))
 
 
 def draw_slots(words, selected_index, offset, margin):
@@ -230,7 +238,7 @@ def draw_game(state):
     global guesses
     global testinput
     w,h = font.size("FPS:        ")
-    margin = 35
+    margin = 10
     surface.blit(pygame.transform.scale(t_surface,(w,h)),
                  (8,SCREEN_HEIGHT-30))
     surface.blit(t_lb_surface,(0,0))
@@ -244,10 +252,14 @@ def draw_game(state):
 
     draw_players(
         guesses,
-        (150, 460+margin))
-    draw_progressbar(
+        (150, 450))
+    draw_text(
         PROGRESS_TEXT.format(str(to_hms(remaining_time))),
-        round(progress_percent))
+        (150, 410))
+    p=round(progress_percent)
+    draw_progressbar(p, (652, 10), reverse=True)
+    draw_progressbar(p, (48, 10),
+                     c1=(100,100,100), c2=(0, 128, 233), reverse=False)
     if progress_percent >= 1.66: #FIXME TOTAL_PERCENT / FPS = 1.66
         progress_percent -= 1.66
 
