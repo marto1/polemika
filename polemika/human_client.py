@@ -140,7 +140,7 @@ def draw_text(message,pos,color=(255,255,255)):
 def draw_progressbar(
         progress,
         coord,
-        size=(100, 401),
+        size=(148, 401),
         reverse=False,
         c1=(0, 128, 233),
         c2=(100,100,100)):
@@ -258,7 +258,7 @@ def draw_game(state):
         (150, 410))
     p=round(progress_percent)
     draw_progressbar(p, (652, 10), reverse=True)
-    draw_progressbar(p, (48, 10),
+    draw_progressbar(p, (0, 10),
                      c1=(100,100,100), c2=(0, 128, 233), reverse=False)
     if progress_percent >= 1.66: #FIXME TOTAL_PERCENT / FPS = 1.66
         progress_percent -= 1.66
