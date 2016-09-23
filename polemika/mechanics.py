@@ -19,6 +19,8 @@ import string
 import logging
 import sys
 
+from misc import setup_logger
+
 fmt = '%(asctime)s %(levelname)s::%(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=fmt)
 
@@ -109,7 +111,13 @@ def equal_words(words, guesses):
 
 class GameProtocol(LineReceiver):
 
-    def __init__(self, users, state):
+    def __init__(self, users, state, log=logging):
+        #per object logging
+        if log == logging:
+            self.log = logging
+        else:
+            setup_logger(log, log)
+            self.log = logging.getLogger(log)
         self.state = state
         self.users = users
         self.name = rstr(20)
@@ -124,7 +132,7 @@ class GameProtocol(LineReceiver):
 
 
     def lineReceived(self, line):
-        logging.debug("RCVD::" + line)
+        self.log.debug("RCVD::" + line)
         try:
             rdata = loads(line)
         except Exception:
@@ -165,7 +173,7 @@ class GameProtocol(LineReceiver):
 
     def broadcast(self, func, *args):
         #FIXME refactor too many func(*args) calls
-        logging.info("BRCAST::"+func(*args))
+        self.log.info("BRCAST::"+func(*args))
         for user in self.users.values():
             GameProtocol.write(user, func, *args)
 
@@ -228,7 +236,7 @@ class GameProtocol(LineReceiver):
 
 class GameFactory(Factory):
 
-    def __init__(self, number, tim, dwords):
+    def __init__(self, number, tim, dwords, log=logging):
         data = read_whole_dict(dwords) #FIXME blocks
         total_words = process_dict(data)
         self.state = Bunch()
@@ -241,9 +249,10 @@ class GameFactory(Factory):
         self.state.rem = None
         self.state.tick = None
         self.users = {}
+        self.log = log
 
     def buildProtocol(self, addr):
-        return GameProtocol(self.users, self.state)
+        return GameProtocol(self.users, self.state, self.log)
 
 if __name__ == '__main__':
     if len(argv) > 1:
