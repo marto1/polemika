@@ -228,9 +228,8 @@ class GameProtocol(LineReceiver):
 
 class GameFactory(Factory):
 
-    def __init__(self, number=NUMBER_PLAYERS, tim=TIME):
-        global DICT
-        data = read_whole_dict(DICT) #FIXME blocks
+    def __init__(self, number, tim, dwords):
+        data = read_whole_dict(dwords) #FIXME blocks
         total_words = process_dict(data)
         self.state = Bunch()
         self.state.total_words = total_words
@@ -251,5 +250,5 @@ if __name__ == '__main__':
         DICT = argv[1]
     else:    
         DICT = "words"
-    reactor.listenTCP(9022, GameFactory())
+    reactor.listenTCP(9022, GameFactory(NUMBER_PLAYERS, TIME, DICT))
     reactor.run()

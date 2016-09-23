@@ -111,24 +111,32 @@ DEFEAT_TABLE_COLOR = (180,0,0,80)
 time_total_seconds = lambda tm: tm.hour*60*60 + tm.minute*60 + tm.second
 BAR_TICK = 0
 
-pygame.init()
+
 
 #global vars
-surface = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
-t_surface = pygame.Surface((SCREEN_WIDTH,25), pygame.SRCALPHA)
-t_lb_surface = pygame.Surface((SCREEN_WIDTH,442), pygame.SRCALPHA)
-t_surface.fill(DEFAULT_TABLE_COLOR)
-t_lb_surface.fill(DEFAULT_TABLE_COLOR)
-pygame.display.set_caption("Fast memory game")
-clock = pygame.time.Clock()
-small_font = pygame.font.Font(STDFONT,14)
-font = pygame.font.Font(STDFONT,20)
-big_font = pygame.font.Font(STDFONT,24)
-progress_percent = 100
-guesses = {}
-TIME = -1
-remaining_time = -1
+surface, t_surface, t_lb_surface = None, None, None
+clock, small_font, font, big_font = None, None, None, None
+progress_percent, guesses, TIME, remaining_time = None, None, None, None
 
+def init_pygame():
+    global surface, t_surface, t_lb_surface
+    global clock, small_font, font, big_font
+    global progress_percent, guesses, TIME, remaining_time
+    pygame.init()
+    surface = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
+    t_surface = pygame.Surface((SCREEN_WIDTH,25), pygame.SRCALPHA)
+    t_lb_surface = pygame.Surface((SCREEN_WIDTH,442), pygame.SRCALPHA)
+    t_surface.fill(DEFAULT_TABLE_COLOR)
+    t_lb_surface.fill(DEFAULT_TABLE_COLOR)
+    pygame.display.set_caption("Fast memory game")
+    clock = pygame.time.Clock()
+    small_font = pygame.font.Font(STDFONT,14)
+    font = pygame.font.Font(STDFONT,20)
+    big_font = pygame.font.Font(STDFONT,24)
+    progress_percent = 100
+    guesses = {}
+    TIME = -1
+    remaining_time = -1
 
 prep_img = lambda x: pygame.transform.scale(
     pygame.image.load(x),
@@ -365,6 +373,7 @@ def reset_human_client_state(state):
     return state
 
 if __name__ == '__main__':
+    init_pygame()
     point = TCP4ClientEndpoint(reactor, "localhost", 9022)
     state = Bunch()
     reset_state(state)
