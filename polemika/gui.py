@@ -35,12 +35,12 @@ def draw_inputbox(
         incolor=(128,128,128),
         size=(500, 36),
         focused=False,
-        thick=3):
+        thick=2):
     slot_cant = pygame.Surface(size, pygame.SRCALPHA)
     slot_cant.fill(incolor)
     surface.blit(slot_cant, pos)
 
-    slot = pygame.Surface((size[0]-thick*2,size[1]-thick*2),
+    slot = pygame.Surface((size[0]-thick*2, size[1]-thick*2),
                           pygame.SRCALPHA)
     slot.fill(color)
     surface.blit(slot, (pos[0]+thick, pos[1]+thick))

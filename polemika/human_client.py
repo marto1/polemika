@@ -127,7 +127,7 @@ def init_pygame():
     pygame.init()
     surface = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
     t_surface = pygame.Surface((SCREEN_WIDTH,25), pygame.SRCALPHA)
-    t_lb_surface = pygame.Surface((SCREEN_WIDTH,442), pygame.SRCALPHA)
+    t_lb_surface = pygame.Surface((SCREEN_WIDTH,600), pygame.SRCALPHA)
     t_surface.fill(DEFAULT_TABLE_COLOR)
     t_lb_surface.fill(DEFAULT_TABLE_COLOR)
     pygame.display.set_caption("Fast memory game")
@@ -141,9 +141,7 @@ def init_pygame():
     remaining_time = -1
     layout = create_layout(surface, 10, 10)
 
-prep_img = lambda x: pygame.transform.scale(
-    pygame.image.load(x),
-    (500, 225))
+prep_img = lambda x: pygame.image.load(x)
 
 def draw_text(message,pos,color=(255,255,255)):
     surface.blit(font.render(message,1,color),pos)
@@ -167,9 +165,12 @@ def draw_progressbar(
               c1, (prog_w, size[1]))
 
 
-def draw_slots(words, selected_index, offset, margin):
+def draw_slots(words, selected_index, offset, margin, size):
     """[{"word":,"trans":,"pic":}..]"""
-    multiplier=1
+    multiplier=0
+    lwords = len(words)
+    size_y = round(size[1] / lwords) if lwords != 0 else 0
+    slot_size = (size[0], size_y)
     for word in words:
         args = [
             surface,
@@ -178,9 +179,9 @@ def draw_slots(words, selected_index, offset, margin):
             font,
             (100,100,100),
             (128,128,128),
-            (500, 36),
+            slot_size,
         ]
-        if selected_index == (multiplier-1):
+        if selected_index == multiplier:
             args.append(SELECTED)
         draw_inputbox(*args)
         multiplier += 1
@@ -255,48 +256,51 @@ def draw_grid_progress_left(s, pos, size):
     )
 
 def draw_grid_progress_right(s, pos, size):
-    # pygame.draw.rect(s, [200,200,200], pygame.Rect(pos,size), 2)
     draw_progressbar(
         round(progress_percent),
         pos,
-        # c1=(100,100,100),
-        # c2=(0, 128, 233),
         reverse=True,
         size=size
     )
 
+def draw_grid_image(s, pos, size, state):
+    surface.blit(
+        pygame.transform.scale(
+            WORDS[state.selected_index]['pic'], size),
+        pos)
+def draw_grid_words(s, pos, size, state):
+    draw_slots(WORDS, state.selected_index, pos, 35, size)
 
+def draw_grid_infobar(s, pos, size):
+    draw_text(
+        PROGRESS_TEXT.format(str(to_hms(remaining_time))),
+        pos)
+
+def draw_grid_players(s, pos, size):
+    draw_players(
+        guesses,
+        pos)
+    
 def draw_game(state):
-    global progress_percent
-    global remaining_time
-    global guesses
-    global testinput
     global layout
+    global progress_percent
+
     w,h = font.size("FPS:        ")
     margin = 10
     surface.blit(pygame.transform.scale(t_surface,(w,h)),
                  (8,SCREEN_HEIGHT-30))
     surface.blit(t_lb_surface,(0,0))
     draw_text("FPS: " + str(int(clock.get_fps())),(10,SCREEN_HEIGHT-30))
-    draw_slots(WORDS, state.selected_index, (150,200), 35)
+    layout.put(draw_grid_words, 1, 4, 8, 3, state)
     if len(WORDS) > 0:
         if WORDS[state.selected_index]['pic']:
-            surface.blit(
-                WORDS[state.selected_index]['pic'],
-                (150, margin))
+            layout.put(draw_grid_image, 1, 0, 8, 4, state)
 
-    draw_players(
-        guesses,
-        (150, 450))
-    draw_text(
-        PROGRESS_TEXT.format(str(to_hms(remaining_time))),
-        (150, 410))
-    p=round(progress_percent)
-    #draw_progressbar(p, (652, 10), reverse=True)
+    layout.put(draw_grid_infobar, 1, 7, 8, 1)
+    layout.put(draw_grid_players, 1, 8, 8, 2)
     layout.put(draw_grid_progress_left, 0, 0, 1, 7)
     layout.put(draw_grid_progress_right, 9, 0, 1, 7)
-    #draw_progressbar(p, (0, 10),
-    #                 c1=(100,100,100), c2=(0, 128, 233), reverse=False)
+
     if progress_percent >= 1.66: #FIXME TOTAL_PERCENT / FPS = 1.66
         progress_percent -= 1.66
 
