@@ -13,6 +13,7 @@ from dummy_player import DummyAI, reset_state, write_on_connection
 from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.endpoints import connectProtocol
 from mechanics import COMMANDS, cmd, GameProtocol, Bunch
+from layout import create_layout
 import random
 
 from gui import draw_slot, draw_inputbox, draw_slot_text
@@ -117,10 +118,11 @@ BAR_TICK = 0
 surface, t_surface, t_lb_surface = None, None, None
 clock, small_font, font, big_font = None, None, None, None
 progress_percent, guesses, TIME, remaining_time = None, None, None, None
+layout = None
 
 def init_pygame():
     global surface, t_surface, t_lb_surface
-    global clock, small_font, font, big_font
+    global clock, small_font, font, big_font, layout
     global progress_percent, guesses, TIME, remaining_time
     pygame.init()
     surface = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
@@ -137,6 +139,7 @@ def init_pygame():
     guesses = {}
     TIME = -1
     remaining_time = -1
+    layout = create_layout(surface, 10, 10)
 
 prep_img = lambda x: pygame.transform.scale(
     pygame.image.load(x),
@@ -158,7 +161,7 @@ def draw_progressbar(
     """
     total = size[0]
     progressw = int((total/100.0)*(100-progress))
-    prog_w = total-progressw if not reverse else total-100+progressw
+    prog_w =  total - progressw if not reverse else progressw
     draw_slot(surface, coord, font, c2, size=size)
     draw_slot(surface, coord, font,
               c1, (prog_w, size[1]))
@@ -240,11 +243,35 @@ def draw_players(players, coord):
         draw_player((x, y), (150, h), player[0], player[1])
         y += h + 10
 
+#horrible hacks
+def draw_grid_progress_left(s, pos, size):
+    draw_progressbar(
+        round(progress_percent),
+        pos,
+        c1=(100,100,100),
+        c2=(0, 128, 233),
+        reverse=False,
+        size=size
+    )
+
+def draw_grid_progress_right(s, pos, size):
+    # pygame.draw.rect(s, [200,200,200], pygame.Rect(pos,size), 2)
+    draw_progressbar(
+        round(progress_percent),
+        pos,
+        # c1=(100,100,100),
+        # c2=(0, 128, 233),
+        reverse=True,
+        size=size
+    )
+
+
 def draw_game(state):
     global progress_percent
     global remaining_time
     global guesses
     global testinput
+    global layout
     w,h = font.size("FPS:        ")
     margin = 10
     surface.blit(pygame.transform.scale(t_surface,(w,h)),
@@ -265,9 +292,11 @@ def draw_game(state):
         PROGRESS_TEXT.format(str(to_hms(remaining_time))),
         (150, 410))
     p=round(progress_percent)
-    draw_progressbar(p, (652, 10), reverse=True)
-    draw_progressbar(p, (0, 10),
-                     c1=(100,100,100), c2=(0, 128, 233), reverse=False)
+    #draw_progressbar(p, (652, 10), reverse=True)
+    layout.put(draw_grid_progress_left, 0, 0, 1, 7)
+    layout.put(draw_grid_progress_right, 9, 0, 1, 7)
+    #draw_progressbar(p, (0, 10),
+    #                 c1=(100,100,100), c2=(0, 128, 233), reverse=False)
     if progress_percent >= 1.66: #FIXME TOTAL_PERCENT / FPS = 1.66
         progress_percent -= 1.66
 
