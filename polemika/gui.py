@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 GUI elements.
 
@@ -79,4 +80,34 @@ def draw_progressbar(
     prog_w =  total - progressw if not reverse else progressw
     draw_slot(surface, pos, size, font, c2)
     draw_slot(surface, pos, (prog_w, size[1]), font, c1)
+
+
+def draw_slots(
+        surface,
+        pos,
+        size,
+        font,
+        words,
+        selected_index,
+        margin,
+        scolor):
+    """[{"word":,"trans":,"pic":}..]"""
+    multiplier=0
+    lwords = len(words)
+    size_y = round(size[1] / lwords) if lwords != 0 else 0
+    slot_size = (size[0], size_y)
+    for word in words:
+        args = [
+            surface,
+            (pos[0],pos[1]+margin*multiplier),
+            slot_size,
+            word["word"] + u"  • " + word["guess"],
+            font,
+            (100,100,100),
+            (128,128,128),
+        ]
+        if selected_index == multiplier:
+            args.append(scolor)
+        draw_inputbox(*args)
+        multiplier += 1
 

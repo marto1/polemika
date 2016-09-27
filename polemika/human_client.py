@@ -18,7 +18,7 @@ from layout import create_layout
 import random
 
 from gui import draw_slot, draw_inputbox, draw_slot_text
-from gui import draw_progressbar
+from gui import draw_progressbar, draw_slots
 
 def to_hms(seconds):
     m, s = divmod(seconds, 60)
@@ -150,29 +150,6 @@ prep_img = lambda x: pygame.image.load(x)
 def draw_text(message,pos,color=(255,255,255)):
     surface.blit(font.render(message,1,color),pos)
 
-
-
-def draw_slots(words, selected_index, offset, margin, size):
-    """[{"word":,"trans":,"pic":}..]"""
-    multiplier=0
-    lwords = len(words)
-    size_y = round(size[1] / lwords) if lwords != 0 else 0
-    slot_size = (size[0], size_y)
-    for word in words:
-        args = [
-            surface,
-            (offset[0],offset[1]+margin*multiplier),
-            slot_size,
-            word["word"] + u"  • " + word["guess"],
-            font,
-            (100,100,100),
-            (128,128,128),
-        ]
-        if selected_index == multiplier:
-            args.append(SELECTED)
-        draw_inputbox(*args)
-        multiplier += 1
-
 def draw_player_correct_box(surface, value, coord, size):
     """Draw a correct box"""
     m = 2
@@ -232,23 +209,11 @@ def draw_players(players, coord):
         y += h + 10
 
 #horrible hacks/wrappers
-def draw_grid_progress_left(s, pos, size):
-    draw_progressbar(
-        s,
-        pos,
-        size,
-
-    )
-
-
 def draw_grid_image(s, pos, size, state):
     surface.blit(
         pygame.transform.scale(
             WORDS[state.selected_index]['pic'], size),
         pos)
-
-def draw_grid_words(s, pos, size, state):
-    draw_slots(WORDS, state.selected_index, pos, 35, size)
 
 def draw_grid_infobar(s, pos, size):
     draw_text(
@@ -272,17 +237,18 @@ def draw_grid_fps_counter(s, pos, size):
 def draw_game(state):
     global layout
     global progress_percent
+    w_args = (font, WORDS, state.selected_index, 35, SELECTED)
+    p = round(progress_percent)
+    pr_args1 =  (font, p, False, (100,100,100), (0, 128, 233))
+    pr_args2 =  (font, p, True)
     layout.put(draw_grid_fps_counter, 0, 9, 1, 1)
     layout.put(draw_grid_background, 0, 0, 10, 10)
-    layout.put(draw_grid_words, 1, 4, 8, 3, state)
-    if len(WORDS) > 0:
+    layout.put(draw_slots, 1, 4, 8, 3, *w_args)
+    if len(WORDS) > 0: #at startup there are no words
         if WORDS[state.selected_index]['pic']:
             layout.put(draw_grid_image, 1, 0, 8, 4, state)
     layout.put(draw_grid_infobar, 1, 7, 8, 1)
     layout.put(draw_grid_players, 1, 8, 8, 2)
-    p = round(progress_percent)
-    pr_args1 =  (font, p, False, (100,100,100), (0, 128, 233))
-    pr_args2 =  (font, p, True)
     layout.put(draw_progressbar, 0, 0, 1, 7, *pr_args1)
     layout.put(draw_progressbar, 9, 0, 1, 7, *pr_args2)
 
