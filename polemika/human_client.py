@@ -13,6 +13,7 @@ from dummy_player import DummyAI, reset_state, write_on_connection
 from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.endpoints import connectProtocol
 from mechanics import COMMANDS, cmd, GameProtocol, Bunch
+from functools import partial
 from layout import create_layout
 import random
 
@@ -236,22 +237,9 @@ def draw_grid_progress_left(s, pos, size):
         s,
         pos,
         size,
-        font,
-        round(progress_percent),
-        reverse=False,
-        c1=(100,100,100),
-        c2=(0, 128, 233),
+
     )
 
-def draw_grid_progress_right(s, pos, size):
-    draw_progressbar(
-        s,
-        pos,
-        size,
-        font,
-        round(progress_percent),
-        reverse=True,
-    )
 
 def draw_grid_image(s, pos, size, state):
     surface.blit(
@@ -292,8 +280,11 @@ def draw_game(state):
             layout.put(draw_grid_image, 1, 0, 8, 4, state)
     layout.put(draw_grid_infobar, 1, 7, 8, 1)
     layout.put(draw_grid_players, 1, 8, 8, 2)
-    layout.put(draw_grid_progress_left, 0, 0, 1, 7)
-    layout.put(draw_grid_progress_right, 9, 0, 1, 7)
+    p = round(progress_percent)
+    pr_args1 =  (font, p, False, (100,100,100), (0, 128, 233))
+    pr_args2 =  (font, p, True)
+    layout.put(draw_progressbar, 0, 0, 1, 7, *pr_args1)
+    layout.put(draw_progressbar, 9, 0, 1, 7, *pr_args2)
 
     if progress_percent >= PROGRESS_STEP:
         progress_percent -= PROGRESS_STEP

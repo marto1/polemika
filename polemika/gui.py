@@ -14,6 +14,7 @@ def draw_slot(
         size,
         font,
         color=(100,100,100)):
+    """Draw a filled rectangle on the surface"""
     slot_surface = pygame.Surface(size, pygame.SRCALPHA)
     slot_surface.fill(color)
     return surface.blit(slot_surface, pos)
@@ -25,6 +26,7 @@ def draw_slot_text(
         message,
         font,
         color=(100,100,100)):
+    """Draw a filled rectangle on the surface and add text"""
     draw_slot(surface, pos, size, font, color)
     return render_text(surface, message, pos, font)
 
@@ -38,6 +40,7 @@ def draw_inputbox(
         incolor=(128,128,128),
         focused=False,
         thick=2):
+    """Draw an editable slot(see draw_slot) with a label"""
     slot_cant = pygame.Surface(size, pygame.SRCALPHA)
     slot_cant.fill(incolor)
     surface.blit(slot_cant, pos)
@@ -67,8 +70,9 @@ def draw_progressbar(
         c1=(0, 128, 233),
         c2=(100,100,100)):
     """
+    A very simple progressbar made up from moving rects.
     progress from 0 to 100.
-    reversed direction 
+    reversed direction is optional(remember to flip colors also)
     """
     total = size[0]
     progressw = int((total/100.0)*(100-progress))
