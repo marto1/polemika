@@ -9,31 +9,31 @@ def render_text(surface, message, pos, font, color=(255,255,255)):
 def draw_slot(
         surface,
         pos,
+        size,
         font,
-        color=(100,100,100),
-        size=(500, 21)):
+        color=(100,100,100)):
     slot_surface = pygame.Surface(size, pygame.SRCALPHA)
     slot_surface.fill(color)
     return surface.blit(slot_surface, pos)
 
 def draw_slot_text(
         surface,
-        message,
         pos,
+        size,
+        message,
         font,
-        color=(100,100,100),
-        size=(500, 21)):
-    draw_slot(surface, pos, font, color, size)
+        color=(100,100,100)):
+    draw_slot(surface, pos, size, font, color)
     return render_text(surface, message, pos, font)
 
 def draw_inputbox(
         surface,
-        message,
         pos,
+        size,
+        message,
         font,
         color=(100,100,100),
         incolor=(128,128,128),
-        size=(500, 36),
         focused=False,
         thick=2):
     slot_cant = pygame.Surface(size, pygame.SRCALPHA)
