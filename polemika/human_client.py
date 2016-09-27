@@ -111,6 +111,8 @@ VICTORY_TABLE_COLOR=(0,180,0,80)
 DEFEAT_TABLE_COLOR = (180,0,0,80)
 time_total_seconds = lambda tm: tm.hour*60*60 + tm.minute*60 + tm.second
 BAR_TICK = 0
+TOTAL_PERCENT = 100
+PROGRESS_STEP = float(TOTAL_PERCENT) / DESIRED_FPS
 
 
 
@@ -244,7 +246,7 @@ def draw_players(players, coord):
         draw_player((x, y), (150, h), player[0], player[1])
         y += h + 10
 
-#horrible hacks
+#horrible hacks/wrappers
 def draw_grid_progress_left(s, pos, size):
     draw_progressbar(
         round(progress_percent),
@@ -268,6 +270,7 @@ def draw_grid_image(s, pos, size, state):
         pygame.transform.scale(
             WORDS[state.selected_index]['pic'], size),
         pos)
+
 def draw_grid_words(s, pos, size, state):
     draw_slots(WORDS, state.selected_index, pos, 35, size)
 
@@ -284,25 +287,28 @@ def draw_grid_players(s, pos, size):
 def draw_grid_background(s, pos, size):
     s.blit(t_lb_surface,pos)
 
+def draw_grid_fps_counter(s, pos, size):
+    down = size[1]/2
+    w,h = font.size("FPS:        ")
+    draw_text("FPS: " + str(int(clock.get_fps())),
+              (pos[0], pos[1]+down))
+
 def draw_game(state):
     global layout
     global progress_percent
-
-    w,h = font.size("FPS:        ")
-    draw_text("FPS: " + str(int(clock.get_fps())),(10,SCREEN_HEIGHT-30))
+    layout.put(draw_grid_fps_counter, 0, 9, 1, 1)
     layout.put(draw_grid_background, 0, 0, 10, 10)
     layout.put(draw_grid_words, 1, 4, 8, 3, state)
     if len(WORDS) > 0:
         if WORDS[state.selected_index]['pic']:
             layout.put(draw_grid_image, 1, 0, 8, 4, state)
-
     layout.put(draw_grid_infobar, 1, 7, 8, 1)
     layout.put(draw_grid_players, 1, 8, 8, 2)
     layout.put(draw_grid_progress_left, 0, 0, 1, 7)
     layout.put(draw_grid_progress_right, 9, 0, 1, 7)
 
-    if progress_percent >= 1.66: #FIXME TOTAL_PERCENT / FPS = 1.66
-        progress_percent -= 1.66
+    if progress_percent >= PROGRESS_STEP:
+        progress_percent -= PROGRESS_STEP
 
 def game_tick(state):
     clock.tick(DESIRED_FPS)
