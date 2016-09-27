@@ -17,6 +17,7 @@ from layout import create_layout
 import random
 
 from gui import draw_slot, draw_inputbox, draw_slot_text
+from gui import draw_progressbar
 
 def to_hms(seconds):
     m, s = divmod(seconds, 60)
@@ -148,22 +149,6 @@ prep_img = lambda x: pygame.image.load(x)
 def draw_text(message,pos,color=(255,255,255)):
     surface.blit(font.render(message,1,color),pos)
 
-def draw_progressbar(
-        progress,
-        coord,
-        size=(148, 401),
-        reverse=False,
-        c1=(0, 128, 233),
-        c2=(100,100,100)):
-    """
-    progress from 0 to 100.
-    reversed direction 
-    """
-    total = size[0]
-    progressw = int((total/100.0)*(100-progress))
-    prog_w =  total - progressw if not reverse else progressw
-    draw_slot(surface, coord, size, font, c2)
-    draw_slot(surface, coord, (prog_w, size[1]), font, c1)
 
 
 def draw_slots(words, selected_index, offset, margin, size):
@@ -248,20 +233,24 @@ def draw_players(players, coord):
 #horrible hacks/wrappers
 def draw_grid_progress_left(s, pos, size):
     draw_progressbar(
-        round(progress_percent),
+        s,
         pos,
+        size,
+        font,
+        round(progress_percent),
+        reverse=False,
         c1=(100,100,100),
         c2=(0, 128, 233),
-        reverse=False,
-        size=size
     )
 
 def draw_grid_progress_right(s, pos, size):
     draw_progressbar(
-        round(progress_percent),
+        s,
         pos,
+        size,
+        font,
+        round(progress_percent),
         reverse=True,
-        size=size
     )
 
 def draw_grid_image(s, pos, size, state):

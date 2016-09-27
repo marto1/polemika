@@ -1,5 +1,7 @@
 """
 GUI elements.
+
+All reusable widgets end up here.
 """
 import pygame
 
@@ -53,3 +55,24 @@ def draw_inputbox(
         cursor = pygame.Surface((3, size[1]-thick*3), pygame.SRCALPHA)
         cursor.fill((48, 48, 48))
         surface.blit(cursor, r.topright)
+
+
+def draw_progressbar(
+        surface,
+        pos,
+        size,
+        font,
+        progress,
+        reverse=False,
+        c1=(0, 128, 233),
+        c2=(100,100,100)):
+    """
+    progress from 0 to 100.
+    reversed direction 
+    """
+    total = size[0]
+    progressw = int((total/100.0)*(100-progress))
+    prog_w =  total - progressw if not reverse else progressw
+    draw_slot(surface, pos, size, font, c2)
+    draw_slot(surface, pos, (prog_w, size[1]), font, c1)
+
