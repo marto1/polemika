@@ -115,20 +115,20 @@ BAR_TICK = 0
 
 
 #global vars
-surface, t_surface, t_lb_surface = None, None, None
+surface, t_lb_surface = None, None
 clock, small_font, font, big_font = None, None, None, None
 progress_percent, guesses, TIME, remaining_time = None, None, None, None
 layout = None
 
 def init_pygame():
-    global surface, t_surface, t_lb_surface
+    global surface, t_lb_surface
     global clock, small_font, font, big_font, layout
     global progress_percent, guesses, TIME, remaining_time
     pygame.init()
-    surface = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
-    t_surface = pygame.Surface((SCREEN_WIDTH,25), pygame.SRCALPHA)
-    t_lb_surface = pygame.Surface((SCREEN_WIDTH,600), pygame.SRCALPHA)
-    t_surface.fill(DEFAULT_TABLE_COLOR)
+    surface = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT),
+                                      RESIZABLE)
+    t_lb_surface = pygame.Surface((SCREEN_WIDTH,SCREEN_HEIGHT),
+                                  pygame.SRCALPHA)
     t_lb_surface.fill(DEFAULT_TABLE_COLOR)
     pygame.display.set_caption("Fast memory game")
     clock = pygame.time.Clock()
@@ -280,17 +280,17 @@ def draw_grid_players(s, pos, size):
     draw_players(
         guesses,
         pos)
-    
+
+def draw_grid_background(s, pos, size):
+    s.blit(t_lb_surface,pos)
+
 def draw_game(state):
     global layout
     global progress_percent
 
     w,h = font.size("FPS:        ")
-    margin = 10
-    surface.blit(pygame.transform.scale(t_surface,(w,h)),
-                 (8,SCREEN_HEIGHT-30))
-    surface.blit(t_lb_surface,(0,0))
     draw_text("FPS: " + str(int(clock.get_fps())),(10,SCREEN_HEIGHT-30))
+    layout.put(draw_grid_background, 0, 0, 10, 10)
     layout.put(draw_grid_words, 1, 4, 8, 3, state)
     if len(WORDS) > 0:
         if WORDS[state.selected_index]['pic']:
@@ -320,6 +320,15 @@ def process_events(state, p):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             reactor.stop()
+        elif event.type == pygame.VIDEORESIZE:
+            global surface, t_lb_surface
+            surface = pygame.display.set_mode((event.w, event.h),
+                                              RESIZABLE)
+            t_lb_surface = pygame.Surface((event.w, event.h),
+                                          pygame.SRCALPHA)
+            t_lb_surface.fill(DEFAULT_TABLE_COLOR)
+            layout.surface = surface
+            layout.update()
         elif event.type == pygame.KEYDOWN:
             if event.key in [pygame.K_DOWN, pygame.K_TAB]:
                 state.selected_index += 1
