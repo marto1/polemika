@@ -162,9 +162,8 @@ def draw_progressbar(
     total = size[0]
     progressw = int((total/100.0)*(100-progress))
     prog_w =  total - progressw if not reverse else progressw
-    draw_slot(surface, coord, font, c2, size=size)
-    draw_slot(surface, coord, font,
-              c1, (prog_w, size[1]))
+    draw_slot(surface, coord, size, font, c2)
+    draw_slot(surface, coord, (prog_w, size[1]), font, c1)
 
 
 def draw_slots(words, selected_index, offset, margin, size):
@@ -176,12 +175,12 @@ def draw_slots(words, selected_index, offset, margin, size):
     for word in words:
         args = [
             surface,
-            word["word"] + u"  • " + word["guess"],
             (offset[0],offset[1]+margin*multiplier),
+            slot_size,
+            word["word"] + u"  • " + word["guess"],
             font,
             (100,100,100),
             (128,128,128),
-            slot_size,
         ]
         if selected_index == multiplier:
             args.append(SELECTED)
@@ -229,7 +228,7 @@ def draw_player(coord, size, name, correct):
     global small_font
     tmp = font
     font = small_font
-    draw_slot_text(surface, name, coord, font, size=(200, name_h))
+    draw_slot_text(surface, coord, (200, name_h), name, font)
     draw_player_correct_bar(
         surface,
         correct,

@@ -2,6 +2,10 @@
 #+TAGS: PROJECT(p) HOME(h) OFFICE(o) PHONE(t) ERRANDS(e)
 #+STARTUP: hidestars
 
+* todos
+** TODO make API uniform in human_client and gui
+** TODO embeddable grid layout
+** TODO separate precalculations from dynamic behaviour(rendering)
 * 1000 core words
 ** https://simple.wikipedia.org/wiki/Wikipedia:VOA_Special_English_Word_Book
 ** get the dict translated in target language
