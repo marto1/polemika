@@ -120,7 +120,7 @@ class GameProtocol(LineReceiver):
             self.log = logging.getLogger(log)
         self.state = state
         self.users = users
-        self.name = rstr(20)
+        self.name = rstr(10)
         self.users[self.name] = self
         self.phase = "initial"        
         self.handlers = {}

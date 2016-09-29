@@ -141,7 +141,7 @@ def init_pygame():
     guesses = {}
     TIME = -1
     remaining_time = -1
-    layout = create_layout(surface, 10, 10)
+    layout = create_layout(surface, 20, 20)
 
 prep_img = lambda x: pygame.image.load(x)
 
@@ -184,16 +184,16 @@ def draw_game(state):
     pr_args1 =  (font, p, False, (100,100,100), (0, 128, 233))
     pr_args2 =  (font, p, True)
     pl_args = (small_font, guesses)
-    layout.put(draw_grid_fps_counter, 0, 9, 1, 1)
-    layout.put(draw_grid_background, 0, 0, 10, 10)
-    layout.put(draw_slots, 1, 4, 8, 3, *w_args)
+    layout.put(draw_grid_background, 0, 0, 20, 20)
+    layout.put(draw_grid_fps_counter, 0, 18, 1, 1)
+    layout.put(draw_slots, 4, 11, 12, 7, *w_args)
     if len(WORDS) > 0: #at startup there are no words
         if WORDS[state.selected_index]['pic']:
-            layout.put(draw_grid_image, 1, 0, 8, 4, state)
-    layout.put(draw_grid_infobar, 1, 7, 8, 1)
-    layout.put(draw_players, 1, 8, 8, 2, *pl_args)
-    layout.put(draw_progressbar, 0, 0, 1, 7, *pr_args1)
-    layout.put(draw_progressbar, 9, 0, 1, 7, *pr_args2)
+            layout.put(draw_grid_image, 4, 1, 12, 10, state)
+    layout.put(draw_grid_infobar, 0, 1, 4, 10)
+    layout.put(draw_players, 16, 1, 4, 2, *pl_args)
+    layout.put(draw_progressbar, 0, 0, 10, 1, *pr_args1)
+    layout.put(draw_progressbar, 10, 0, 10, 1, *pr_args2)
 
     if progress_percent >= PROGRESS_STEP:
         progress_percent -= PROGRESS_STEP

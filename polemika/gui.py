@@ -149,7 +149,8 @@ def draw_player_correct_bar(
     x, y = pos
     w, h = size
     off = 0
-    box_w = 39.9 #why?
+    lcorr = len(correct)
+    box_w = size[0] / lcorr if lcorr > 0 else 0
     for val in correct:
         draw_player_correct_box(surface,(x+off, y), (box_w, 10), val)
         off += box_w
@@ -160,14 +161,14 @@ def draw_player(
         size,
         font,
         name,
-        correct):
+        correct):     
     name_h = round(size[1] * 0.5)
     guess_h = size[1] - name_h
-    draw_slot_text(surface, pos, (200, name_h), name, font)
+    draw_slot_text(surface, pos, (size[0], name_h), name, font)
     draw_player_correct_bar(
         surface,
         (pos[0], pos[1] + name_h),
-        (200, name_h),
+        (size[0], name_h),
         correct)
 
 def draw_players(
@@ -179,11 +180,12 @@ def draw_players(
     """[[name, [0, 0, 1, 0]], ...]"""
     x, y = pos
     h = 30
+    lpl = len(players)
     for player in players.iteritems():
         draw_player(
             surface,
             (x, y),
-            (150, h),
+            (size[0], h),
             font,
             player[0],
             player[1])
