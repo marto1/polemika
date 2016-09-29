@@ -5,6 +5,8 @@ GUI elements.
 All reusable widgets end up here.
 """
 import pygame
+from math import modf
+from layout import create_layout
 
 def render_text(surface, message, pos, font, color=(255,255,255)):
     return surface.blit(font.render(message,1,color),pos)
@@ -92,9 +94,10 @@ def draw_slots(
         margin,
         scolor):
     """[{"word":,"trans":,"pic":}..]"""
+    layout = create_layout
     multiplier=0
     lwords = len(words)
-    size_y = round(size[1] / lwords) if lwords != 0 else 0
+    size_y = size[1] / lwords if lwords != 0 else 0
     slot_size = (size[0], size_y)
     for word in words:
         args = [
@@ -110,4 +113,79 @@ def draw_slots(
             args.append(scolor)
         draw_inputbox(*args)
         multiplier += 1
+
+CORRECT_BOX = (0,10,255)
+NOT_CORRECT_BOX = (255,10,0)
+KANT_COLOR = (96, 96, 96)
+
+def draw_player_correct_box(
+        surface,
+        pos,
+        size,
+        value):
+    """Draw a correct box"""
+    m = 2
+    kant_box = pygame.Surface((size[0]+m, size[1]+m),pygame.SRCALPHA)
+    box = pygame.Surface((size[0]-m, size[1]-m),pygame.SRCALPHA)
+    kant_box.fill(KANT_COLOR)
+    if value == 0:
+        box.fill(NOT_CORRECT_BOX)
+    elif value == 1:
+        box.fill(CORRECT_BOX)
+    else:
+        raise ValueError("Correct box not 0/1")
+    surface.blit(kant_box, pos)
+    surface.blit(box, (pos[0]+m, pos[1]+m))
+
+def draw_player_correct_bar(
+        surface,
+        pos,
+        size,
+        correct):
+    """
+    Draws CORRECT/NOT CORRECT labels for other players
+    playing the game.
+    """
+    x, y = pos
+    w, h = size
+    off = 0
+    box_w = 39.9 #why?
+    for val in correct:
+        draw_player_correct_box(surface,(x+off, y), (box_w, 10), val)
+        off += box_w
+
+def draw_player(
+        surface,
+        pos,
+        size,
+        font,
+        name,
+        correct):
+    name_h = round(size[1] * 0.5)
+    guess_h = size[1] - name_h
+    draw_slot_text(surface, pos, (200, name_h), name, font)
+    draw_player_correct_bar(
+        surface,
+        (pos[0], pos[1] + name_h),
+        (200, name_h),
+        correct)
+
+def draw_players(
+        surface,
+        pos,
+        size,
+        font,
+        players):
+    """[[name, [0, 0, 1, 0]], ...]"""
+    x, y = pos
+    h = 30
+    for player in players.iteritems():
+        draw_player(
+            surface,
+            (x, y),
+            (150, h),
+            font,
+            player[0],
+            player[1])
+        y += h + 10
 

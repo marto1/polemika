@@ -19,6 +19,7 @@ import random
 
 from gui import draw_slot, draw_inputbox, draw_slot_text
 from gui import draw_progressbar, draw_slots
+from gui import draw_player_correct_bar, draw_players
 
 def to_hms(seconds):
     m, s = divmod(seconds, 60)
@@ -103,9 +104,6 @@ STDFONT = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
 PROGRESS_TEXT = "Time: {0}"
 SELECTED = (128, 0, 100)
 UNSELECTED = (128,128,128)
-CORRECT_BOX = (0,10,255)
-NOT_CORRECT_BOX = (255,10,0)
-KANT_COLOR = (96, 96, 96)
 DESIRED_FPS = 60.0
 SCREEN_WIDTH, SCREEN_HEIGHT = (800,600)
 DEFAULT_TABLE_COLOR = (50,50,50,80)
@@ -148,65 +146,12 @@ def init_pygame():
 prep_img = lambda x: pygame.image.load(x)
 
 def draw_text(message,pos,color=(255,255,255)):
-    surface.blit(font.render(message,1,color),pos)
-
-def draw_player_correct_box(surface, value, coord, size):
-    """Draw a correct box"""
-    m = 2
-    kant_box = pygame.Surface((size[0]+m, size[1]+m),pygame.SRCALPHA)
-    box = pygame.Surface((size[0]-m, size[1]-m),pygame.SRCALPHA)
-    kant_box.fill(KANT_COLOR)
-    if value == 0:
-        box.fill(NOT_CORRECT_BOX)
-    elif value == 1:
-        box.fill(CORRECT_BOX)
-    else:
-        raise ValueError("Correct box not 0/1")
-    surface.blit(kant_box, coord)
-    surface.blit(box, (coord[0]+m, coord[1]+m))
-    
-
-def draw_player_correct_bar(surface, correct, coord, size):
-    """
-    Draws CORRECT/NOT CORRECT labels for other players
-    playing the game.
-    """
-    #draw_player_correct_box
-    x, y = coord
-    w, h = size
-    off = 0
-    box_w = 39.9 #why?
-    for val in correct:
-        draw_player_correct_box(surface, val, (x+off, y), (box_w, 10))
-        off += box_w
+    surface.blit(font.render(message,1,color),pos)    
 
 
 def conv_guesses(guess):
     return " ".join([str(x) for x in guess])
 
-def draw_player(coord, size, name, correct):
-    name_h = round(size[1] * 0.5)
-    guess_h = size[1] - name_h
-    global font
-    global small_font
-    tmp = font
-    font = small_font
-    draw_slot_text(surface, coord, (200, name_h), name, font)
-    draw_player_correct_bar(
-        surface,
-        correct,
-        (coord[0], coord[1] + name_h),
-        (200, name_h))
-    font = tmp
-    
-
-def draw_players(players, coord):
-    """[[name, [0, 0, 1, 0]], ...]"""
-    x, y = coord
-    h = 30
-    for player in players.iteritems():
-        draw_player((x, y), (150, h), player[0], player[1])
-        y += h + 10
 
 #horrible hacks/wrappers
 def draw_grid_image(s, pos, size, state):
@@ -220,10 +165,7 @@ def draw_grid_infobar(s, pos, size):
         PROGRESS_TEXT.format(str(to_hms(remaining_time))),
         pos)
 
-def draw_grid_players(s, pos, size):
-    draw_players(
-        guesses,
-        pos)
+
 
 def draw_grid_background(s, pos, size):
     s.blit(t_lb_surface,pos)
@@ -241,6 +183,7 @@ def draw_game(state):
     p = round(progress_percent)
     pr_args1 =  (font, p, False, (100,100,100), (0, 128, 233))
     pr_args2 =  (font, p, True)
+    pl_args = (small_font, guesses)
     layout.put(draw_grid_fps_counter, 0, 9, 1, 1)
     layout.put(draw_grid_background, 0, 0, 10, 10)
     layout.put(draw_slots, 1, 4, 8, 3, *w_args)
@@ -248,7 +191,7 @@ def draw_game(state):
         if WORDS[state.selected_index]['pic']:
             layout.put(draw_grid_image, 1, 0, 8, 4, state)
     layout.put(draw_grid_infobar, 1, 7, 8, 1)
-    layout.put(draw_grid_players, 1, 8, 8, 2)
+    layout.put(draw_players, 1, 8, 8, 2, *pl_args)
     layout.put(draw_progressbar, 0, 0, 1, 7, *pr_args1)
     layout.put(draw_progressbar, 9, 0, 1, 7, *pr_args2)
 
