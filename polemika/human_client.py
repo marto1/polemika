@@ -135,8 +135,8 @@ def init_pygame():
     pygame.display.set_caption("Fast memory game")
     clock = pygame.time.Clock()
     small_font = pygame.font.Font(STDFONT,14)
-    font = pygame.font.Font(STDFONT,20)
-    big_font = pygame.font.Font(STDFONT,24)
+    font = pygame.font.Font(STDFONT,22)
+    big_font = pygame.font.Font(STDFONT,28)
     progress_percent = 100
     guesses = {}
     TIME = -1
