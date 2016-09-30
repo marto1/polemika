@@ -17,7 +17,7 @@ from functools import partial
 from layout import create_layout
 import random
 
-from gui import draw_slot, draw_inputbox, draw_slot_text
+from gui import draw_inputbox, draw_slot_text
 from gui import draw_progressbar, draw_slots
 from gui import draw_player_correct_bar, draw_players
 
@@ -179,14 +179,14 @@ def draw_grid_fps_counter(s, pos, size):
 def draw_game(state):
     global layout
     global progress_percent
-    w_args = (font, WORDS, state.selected_index, 35, SELECTED)
+    w_args = (font, WORDS, state.selected_index, 1, SELECTED)
     p = round(progress_percent)
     pr_args1 =  (font, p, False, (100,100,100), (0, 128, 233))
     pr_args2 =  (font, p, True)
     pl_args = (small_font, guesses)
     layout.put(draw_grid_background, 0, 0, 20, 20)
     layout.put(draw_grid_fps_counter, 0, 18, 1, 1)
-    layout.put(draw_slots, 4, 11, 12, 7, *w_args)
+    layout.put(draw_slots, 4, 11, 12, 9, *w_args)
     if len(WORDS) > 0: #at startup there are no words
         if WORDS[state.selected_index]['pic']:
             layout.put(draw_grid_image, 4, 1, 12, 10, state)

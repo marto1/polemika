@@ -51,11 +51,12 @@ def draw_inputbox(
     slot = pygame.Surface((size[0]-thick*2, size[1]-thick*2),
                           pygame.SRCALPHA)
     slot.fill(color)
-    surface.blit(slot, (pos[0]+thick, pos[1]+thick))
+    ys = (pos[1]+thick)
+    surface.blit(slot, (pos[0]+thick, ys))
     r = render_text(
         surface,
         message,
-        (pos[0]+thick+2, pos[1]+thick+2),
+        (pos[0]+thick+2, ys),
         font)
     if focused:
         cursor = pygame.Surface((3, size[1]-thick*3), pygame.SRCALPHA)
@@ -94,7 +95,6 @@ def draw_slots(
         margin,
         scolor):
     """[{"word":,"trans":,"pic":}..]"""
-    layout = create_layout
     multiplier=0
     lwords = len(words)
     size_y = size[1] / lwords if lwords != 0 else 0
@@ -102,7 +102,7 @@ def draw_slots(
     for word in words:
         args = [
             surface,
-            (pos[0],pos[1]+margin*multiplier),
+            (pos[0],pos[1]+size_y*multiplier+margin),
             slot_size,
             word["word"] + u"  • " + word["guess"],
             font,
