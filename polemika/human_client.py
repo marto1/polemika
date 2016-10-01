@@ -6,7 +6,6 @@ import pygame
 from datetime import datetime, date
 import pygame,random,math
 from pygame.locals import *
-from random import randint
 from datetime import time, tzinfo, timedelta
 from copy import copy
 from dummy_player import DummyAI, reset_state, write_on_connection
@@ -54,7 +53,7 @@ class HumanPlayer(DummyAI):
         self.state.remaining_time = data[0]
         self.state.progress_percent = 100
         remaining_time = data[0]
-        progress_percent = 100 #BAR_TICK * remaining_time
+        progress_percent = 100
 
     def process_total_time(self, data):
         global TIME
@@ -114,8 +113,6 @@ BAR_TICK = 0
 TOTAL_PERCENT = 100
 PROGRESS_STEP = float(TOTAL_PERCENT) / DESIRED_FPS
 
-
-
 #global vars
 surface, t_lb_surface = None, None
 clock, small_font, font, big_font = None, None, None, None
@@ -146,12 +143,7 @@ def init_pygame():
 prep_img = lambda x: pygame.image.load(x)
 
 def draw_text(message,pos,color=(255,255,255)):
-    surface.blit(font.render(message,1,color),pos)    
-
-
-def conv_guesses(guess):
-    return " ".join([str(x) for x in guess])
-
+    surface.blit(font.render(message,1,color),pos)
 
 #horrible hacks/wrappers
 def draw_grid_image(s, pos, size, state):
@@ -164,8 +156,6 @@ def draw_grid_infobar(s, pos, size):
     draw_text(
         PROGRESS_TEXT.format(str(to_hms(remaining_time))),
         pos)
-
-
 
 def draw_grid_background(s, pos, size):
     s.blit(t_lb_surface,pos)
@@ -241,56 +231,6 @@ def process_events(state, p):
 def show_correct(words):
     for word in words:
         word["guess"] += u"  •  " + word["trans"]
-
-def countdown_remaining_time():
-    global remaining_time
-    global rem
-    global progress_percent
-    #datetime.time can't do arithmetics, horrible code below
-    if not remaining_time.hour and not remaining_time.minute and not remaining_time.second:
-        t_lb_surface.fill(DEFEAT_TABLE_COLOR)
-        rem.stop()
-        task.deferLater(reactor, 2, reset_game)
-        show_correct(WORDS)
-        return
-    td = date.today()
-    remaining_time = datetime.combine(td, remaining_time) - datetime.combine(td, time(0, 0, 1))
-    hours, remainder = divmod(remaining_time.seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    remaining_time = time(hours, minutes, seconds)
-    progress_percent -= BAR_TICK
-
-def read_whole_dict(filename):
-    with open(filename, "r") as f:
-        data = [line for line in f.readlines()]
-    return data
-
-def process_line(line):
-    raw = line[:-1].split(",")
-    img = None
-    if len(raw) == 3:
-        img = prep_img(raw[2])
-    return {
-        "word" :  raw[1].decode("utf-8"),
-        "pic"  :  img,
-        "trans":  raw[0].decode("utf-8"),
-        "guess":  u"",}
-
-def process_dict(data):
-    return [process_line(line) for line in data]
-
-def reset_game():
-    global rem
-    global remaining_time
-    global k
-    global WORDS
-    remaining_time = copy(TIME)
-    k = 100
-    rem.start(1)
-    t_lb_surface.fill(DEFAULT_TABLE_COLOR)
-    total_words = process_dict(data)
-    WORDS = random.sample(total_words, 5)
-
 
 WORDS = []
 def start_game_loops(p, state):

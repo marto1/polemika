@@ -8,6 +8,10 @@ import pygame
 from math import modf
 from layout import create_layout
 
+CORRECT_BOX = (0,10,255)
+NOT_CORRECT_BOX = (255,10,0)
+KANT_COLOR = (96, 96, 96)
+
 def render_text(surface, message, pos, font, color=(255,255,255)):
     return surface.blit(font.render(message,1,color),pos)
 
@@ -113,10 +117,6 @@ def draw_slots(
             args.append(scolor)
         draw_inputbox(*args)
         multiplier += 1
-
-CORRECT_BOX = (0,10,255)
-NOT_CORRECT_BOX = (255,10,0)
-KANT_COLOR = (96, 96, 96)
 
 def draw_player_correct_box(
         surface,
