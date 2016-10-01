@@ -14,12 +14,19 @@ class Layout(object):
         self.rows = rows
         self.update()
 
-    def put(self, draw, xtile, ytile, xspan=1, yspan=1, *args):
+    def get_position(self, xtile, ytile, xspan=1, yspan=1):
+        """Calculates absolute coordinates and size."""
         xstep, ystep = self.xstep, self.ystep
-        return draw(
+        return (
             self.surface,
             (xstep*xtile, ytile*ystep),
-            (xstep*xspan, ystep*yspan), *args)
+            (xstep*xspan, ystep*yspan))
+
+    def put(self, draw, xtile, ytile, xspan=1, yspan=1, *args):
+        """Calculates layout and draws on screen. Careful."""
+        gpos = self.get_position
+        res = gpos(xtile, ytile, xspan, yspan)+args
+        return draw(*res)
 
     def update(self):
         self.xstep = self.surface.get_width() / self.cols
