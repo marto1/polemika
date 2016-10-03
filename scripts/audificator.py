@@ -24,8 +24,19 @@ def sum_chunks(string, chunk):
         res.append(sum([ord(x) for x in c]))
     return res
 
+def bin_to_progression(cnum):
+    """Make alternating progression with applied mask"""
+    cnum = '{:b}'.format(cnum)
+    lbits = len(cnum)
+    cnum = tuple(bool(int(b)) for b in cnum)
+    res = [-x if x % 2 == 0 else x for x in xrange(lbits)]
+    for x in reversed(range(lbits)):
+        if not cnum[x]:
+            del res[x]
+    return res
+
 def choose_base_freq(chunk_nums):
-    pass
+    return [abs(sum(bin_to_progression(cnum))) for cnum in chunk_nums]
     
 
 def generate_chords(
@@ -35,16 +46,17 @@ def generate_chords(
         chunk=3,
         freq=(30, 360)):
     global CHORDS
-    CHORDS = {"MONO":[choose_base_freq(string, chunk)]}
+    base = choose_base_freq(sum_chunks(string, chunk))
+    clamp = lambda n, minn, maxn: max(min(maxn, n), minn)
+    base = [clamp(freq[0] + x,*freq) for x in base]
+    CHORDS = {"MONO":base}
     return ["MONO"]
 
 
 
 CHORDS = {}
 
-# PROGRESSION = generate_chords(encode_string)
-
-print sum_chunks(encode_string, 3)
+PROGRESSION = generate_chords(encode_string)
 
 class Voice(object):
     def __init__(self, note, length):
