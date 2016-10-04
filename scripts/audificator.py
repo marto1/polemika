@@ -25,7 +25,7 @@ def sum_chunks(string, chunk):
     return res
 
 def bin_to_progression(cnum):
-    """Make alternating progression with applied mask"""
+    """Make alternating progression from 0..len(mask) and apply mask"""
     cnum = '{:b}'.format(cnum)
     lbits = len(cnum)
     cnum = tuple(bool(int(b)) for b in cnum)
@@ -37,7 +37,9 @@ def bin_to_progression(cnum):
 
 def choose_base_freq(chunk_nums):
     return [abs(sum(bin_to_progression(cnum))) for cnum in chunk_nums]
-    
+
+def choose_chords(chunk_sums, bases, chords=1):
+    return bases
 
 def generate_chords(
         string,
@@ -46,13 +48,13 @@ def generate_chords(
         chunk=3,
         freq=(30, 360)):
     global CHORDS
-    base = choose_base_freq(sum_chunks(string, chunk))
+    sums = sum_chunks(string, chunk)
+    bases = choose_base_freq(sums)
     clamp = lambda n, minn, maxn: max(min(maxn, n), minn)
-    base = [clamp(freq[0] + x,*freq) for x in base]
-    CHORDS = {"MONO":base}
+    bases = [clamp(freq[0] + x,*freq) for x in bases]
+    chords = choose_chords(sums, bases, 1)
+    CHORDS = {"MONO" : chords}
     return ["MONO"]
-
-
 
 CHORDS = {}
 
