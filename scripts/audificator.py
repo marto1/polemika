@@ -52,7 +52,7 @@ def generate_chords(
     bases = choose_base_freq(sums)
     clamp = lambda n, minn, maxn: max(min(maxn, n), minn)
     bases = [clamp(freq[0] + x,*freq) for x in bases]
-    chords = choose_chords(sums, bases, 1)
+    chords = choose_chords(sums, bases, maxchords)
     CHORDS = {"MONO" : chords}
     return ["MONO"]
 
