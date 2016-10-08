@@ -12,7 +12,7 @@ import math
 import wave
 from array import array
 
-encode_string = b"hello there"
+encode_string = b"omdøbning"
 
 def inchunks(l, n):
     n = max(1, n)
@@ -39,20 +39,25 @@ def choose_base_freq(chunk_nums):
     return [abs(sum(bin_to_progression(cnum))) for cnum in chunk_nums]
 
 def choose_chords(chunk_sums, bases, chords=1):
-    return bases
+    res = bases[:chords]
+    rem = sum([abs(sum(bin_to_progression(b))) for b in bases[chords:]])
+    res = map(lambda x: x + rem, res)
+    return res
 
 def generate_chords(
         string,
         progression = 3,
         maxchords = 3,
         chunk=3,
-        freq=(30, 360)):
+        freq=(100, 360)):
     global CHORDS
     sums = sum_chunks(string, chunk)
+    print sums
     bases = choose_base_freq(sums)
     clamp = lambda n, minn, maxn: max(min(maxn, n), minn)
     bases = [clamp(freq[0] + x,*freq) for x in bases]
     chords = choose_chords(sums, bases, maxchords)
+    print chords
     CHORDS = {"MONO" : chords}
     return ["MONO"]
 
@@ -212,23 +217,29 @@ output = quantizer(attenuated_samples)
 
 
 # prepare audio stream
-audiofile = wave.open("output.wav", "wb")
-audiofile.setnchannels(1)
-audiofile.setsampwidth(2)
-audiofile.setframerate(44100)
+# audiofile = wave.open("output.wav", "wb")
+# audiofile.setnchannels(1)
+# audiofile.setsampwidth(2)
+# audiofile.setframerate(44100)
 
-# render samples
-output = list(output)
-audiofile.writeframes(array('h', output))
-audiofile.writeframes(array('h', output))
-audiofile.close()
+# # render samples
+# output = list(output)
+# audiofile.writeframes(array('h', output))
+# audiofile.writeframes(array('h', output))
+# audiofile.close()
 
-import pygame
+# import pygame
 
-pygame.init()
-pygame.mixer.init()
-sounda= pygame.mixer.Sound("output.wav")
+# def set_all_volume(sounds,mult):
+#     for sound in sounds:
+#         vol = sound.get_volume()
+#         sound.set_volume(min(vol*mult,1.0))
 
-channela = sounda.play()
-while channela.get_busy():
-   pygame.time.delay(100)
+# pygame.init()
+# pygame.mixer.init()
+# sounda= pygame.mixer.Sound("output.wav")
+# set_all_volume([sounda],1)
+
+# channela = sounda.play()
+# while channela.get_busy():
+#    pygame.time.delay(100)
