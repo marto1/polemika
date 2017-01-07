@@ -5,6 +5,7 @@ GUI elements.
 All reusable widgets end up here.
 """
 import pygame
+import logging
 
 CORRECT_BOX = (0, 10, 255)
 NOT_CORRECT_BOX = (255, 10, 0)
@@ -47,7 +48,6 @@ def draw_inputbox(
         font,
         color=(100, 100, 100),
         incolor=(128, 128, 128),
-        focused=False,
         thick=2):
     """Draw an editable slot(see draw_slot) with a label"""
     slot_cant = pygame.Surface(size, pygame.SRCALPHA)
@@ -64,10 +64,21 @@ def draw_inputbox(
         message,
         (pos[0]+thick+2, ys),
         font)
-    if focused:
-        cursor = pygame.Surface((3, size[1]-thick*3), pygame.SRCALPHA)
-        cursor.fill((48, 48, 48))
-        surface.blit(cursor, r.topright)
+
+def draw_cursor(
+        surface,
+        pos,
+        size,
+        letters,
+        cpos):
+    cursor = pygame.Surface((10, size[1]), pygame.SRCALPHA)
+    cursor.fill((48, 48, 48))
+    endpos = (pos[0], pos[1])
+    surface.blit(cursor, endpos)
+    # if cpos == letters:
+    #     surface.blit(cursor, endpos)
+    # else:
+    #     surface.blit(cursor, pos)
 
 
 def draw_progressbar(
@@ -99,25 +110,36 @@ def draw_slots(
         words,
         selected_index,
         margin,
-        scolor):
+        scolor,
+        cursor):
     """[{"word":,"trans":,"pic":}..]"""
     multiplier = 0
     lwords = len(words)
     size_y = size[1] / lwords if lwords != 0 else 0
     slot_size = (size[0], size_y)
+    thick = 2
     for word in words:
+        display_text = word["word"] + u"  • " + word["guess"]
+        p = (pos[0], pos[1]+size_y*multiplier+margin)
         args = [
             surface,
-            (pos[0], pos[1]+size_y*multiplier+margin),
+            p,
             slot_size,
-            word["word"] + u"  • " + word["guess"],
+            display_text,
             font,
             (100, 100, 100),
             (128, 128, 128),
         ]
-        if selected_index == multiplier:
-            args.append(scolor)
         draw_inputbox(*args)
+        if selected_index == multiplier:
+            #calculate cursor offset + some breathe space
+            r = font.render(display_text + "x",
+                            1, scolor)
+            cursor_offset = (
+                p[0] + r.get_bounding_rect().w, p[1] + thick)
+            cursor_size = (slot_size[0], slot_size[1] - thick*2)
+            draw_cursor(surface, cursor_offset, cursor_size,
+                        len(word["guess"]), cursor)
         multiplier += 1
 
 

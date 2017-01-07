@@ -8,6 +8,7 @@ from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.endpoints import connectProtocol
 from mechanics import cmd, Bunch
 from layout import create_layout
+import logging
 from gui import draw_progressbar, draw_slots, draw_players
 
 
@@ -172,7 +173,8 @@ def draw_grid_fps_counter(s, pos, size):
 def draw_game(state):
     global layout
     global progress_percent
-    w_args = (font, WORDS, state.selected_index, 1, SELECTED)
+    w_args = (font, WORDS, state.selected_index, 1, SELECTED,
+              state.cursor)
     p = round(progress_percent)
     pr_args1 = (font, p, False, (100, 100, 100), (0, 128, 233))
     pr_args2 = (font, p, True)
@@ -229,6 +231,12 @@ def process_events(state, p):
                     state.selected_index = len(WORDS) - 1
             elif event.key == pygame.K_RETURN:
                 p.write(cmd.guesses, [x['guess'] for x in WORDS])
+            # add cursor movement
+            # ctrl+a - begin, ctrl+e - end,ctrl+f - forward, ctrl+b 
+            elif event.key == pygame.K_a and pygame.key.get_mods() & pygame.KMOD_LCTRL:
+                state.cursor = 0
+            elif event.key == pygame.K_e and pygame.key.get_mods() & pygame.KMOD_LCTRL:
+                state.cursor = len(WORDS[state.selected_index]["guess"])
             else:   # assume text input
                 if len(WORDS) > 0:
                     WORDS[state.selected_index]["guess"] += event.unicode
@@ -256,6 +264,7 @@ def reset_human_client_state(state):
     state.selected_index = 0
     state.guesses = {}
     state.block_input = False
+    state.cursor = 0 #cursor position on word
     return state
 
 
