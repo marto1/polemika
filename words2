@@ -244,7 +244,6 @@ græd,cried
 forladt,forsaken/abandoned
 hvordan,how
 øde,desolate
-bekræfte,confirm
 i strid,contrary
 hævn,revenge
 eneste,only
@@ -274,7 +273,7 @@ videre,further
 sår,wound
 burde,should
 det gør det,it does
-bekræfte,confirm
+bekræft,confirm
 sandt,truth
 egentlige,actual
 efterligne,imitate
@@ -581,5 +580,11 @@ stadig,still
 regnskab,accounting
 fortæller,narrator
 usædvanligt,unusual
-
-
+bakspejlet,retrospect
+indtastning,entry
+målrette,target
+bekostning,expense
+slipper,release
+bekvemmelighed,convenience
+erfaringer,experience
+indført,introduced
