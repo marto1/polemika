@@ -94,7 +94,7 @@ class HumanPlayer(DummyAI):
 
 
 #constants
-STDFONT = "/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-L.ttf"
+STDFONT = "/usr/share/fonts/truetype/ubuntu/Ubuntu-L.ttf"
 PROGRESS_TEXT = "Time: {0}"
 SELECTED = (128, 0, 100)
 UNSELECTED = (128, 128, 128)
