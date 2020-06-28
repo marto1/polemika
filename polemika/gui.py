@@ -207,7 +207,7 @@ def draw_players(
     """[[name, [0, 0, 1, 0]], ...]"""
     x, y = pos
     h = 30
-    for player in players.iteritems():
+    for player in players.items():
         draw_player(
             surface,
             (x, y),

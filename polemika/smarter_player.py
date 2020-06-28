@@ -4,8 +4,8 @@ Will remember some words depending on frequency of occurrence.
 The rest will be dummy guessed.
 """
 
-from dummy_player import *
-from mechanics import COMMANDS, cmd, Bunch
+from polemika.dummy_player import *
+from polemika.mechanics import COMMANDS, cmd, Bunch
 from random import randint, choice
 
 class MomentAI(DummyAI):

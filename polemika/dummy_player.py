@@ -10,7 +10,7 @@ from twisted.internet.protocol import Factory
 from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.endpoints import connectProtocol
 import random
-from mechanics import COMMANDS, cmd, GameProtocol, Bunch
+from polemika.mechanics import COMMANDS, cmd, GameProtocol, Bunch
 
 class DummyAI(GameProtocol):
 

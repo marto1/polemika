@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-from twisted.internet.task import LoopingCall
-from twisted.internet import reactor
 import pygame
+import logging
+from twisted.internet import reactor
+from twisted.internet.task import LoopingCall
 from pygame.locals import *
-from dummy_player import DummyAI, reset_state, write_on_connection
+from polemika.gui import draw_progressbar, draw_slots, draw_players
+from polemika.dummy_player import DummyAI, reset_state, write_on_connection
 from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.endpoints import connectProtocol
-from mechanics import cmd, Bunch
-from layout import create_layout
-import logging
-from gui import draw_progressbar, draw_slots, draw_players
+from polemika.mechanics import cmd, Bunch
+from polemika.layout import create_layout
+
+
+
 
 
 def to_hms(seconds):

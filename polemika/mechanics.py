@@ -19,7 +19,7 @@ import string
 import logging
 import sys
 
-from misc import setup_logger
+# from misc import setup_logger
 
 fmt = '%(asctime)s %(levelname)s::%(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=fmt)
@@ -53,7 +53,7 @@ def dump_command(command, *args):
     return dumps(res)
 
 cmd = Bunch(**{
-    y : partial(dump_command, z) for y,z in COMMANDS.iteritems()
+    y : partial(dump_command, z) for y,z in COMMANDS.items()
 }) #wow
 
 def read_whole_dict(filename):
@@ -68,10 +68,11 @@ def process_line(line):
         img = raw[2]
     try:
         return {
-            "word" :  raw[1].decode("utf-8"),
+            "word" :  raw[1],
             "pic"  :  img,
-            "trans":  raw[0].decode("utf-8"),}
-    except Exception:
+            "trans":  raw[0],}
+    except Exception as e:
+        print(e)
         raise ValueError(u"Bad line:{0}".format(raw))
 
 def process_dict(data):
@@ -116,7 +117,6 @@ class GameProtocol(LineReceiver):
         if log == logging:
             self.log = logging
         else:
-            setup_logger(log, log)
             self.log = logging.getLogger(log)
         self.state = state
         self.users = users
@@ -132,7 +132,7 @@ class GameProtocol(LineReceiver):
 
 
     def lineReceived(self, line):
-        self.log.debug("RCVD::" + line)
+        self.log.debug("RCVD::" + str(line))
         try:
             rdata = loads(line)
         except Exception:
@@ -158,7 +158,7 @@ class GameProtocol(LineReceiver):
             self.state.tick.stop()
 
     def connectionLost(self, reason):
-        if self.users.has_key(self.name):
+        if self.name in self.users:
             del self.users[self.name]
             self.broadcast(cmd.disconnected, self.name)
             self.broadcast(cmd.reset)
