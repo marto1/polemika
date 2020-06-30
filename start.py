@@ -9,10 +9,9 @@ By default it starts a single-player game with one bot.
 """
 import os
 import sys
-import logging
 from sys import argv
 from time import sleep
-from twisted.internet import reactor, protocol, task
+from twisted.internet import reactor, protocol
 from twisted.internet.endpoints import TCP4ClientEndpoint
 from twisted.internet.endpoints import connectProtocol
 from polemika.mechanics import GameFactory, Bunch
@@ -46,10 +45,10 @@ def start_human_player(lname):
 if __name__ == '__main__':
     if len(argv) > 1:
         DICT = argv[1]
-    else:    
+    else:
         DICT = "words"
     start_server(2, 30, DICT, "server.log")
     sleep(0.5)
     start_smart_player('ai.log')
-    start_human_player('human.log')
-    reactor.run()    
+    # start_human_player('human.log')
+    reactor.run()

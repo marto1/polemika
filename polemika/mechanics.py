@@ -19,7 +19,7 @@ import string
 import logging
 import sys
 
-# from misc import setup_logger
+from polemika.misc import setup_logger
 
 fmt = '%(asctime)s %(levelname)s::%(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=fmt)
@@ -117,6 +117,7 @@ class GameProtocol(LineReceiver):
         if log == logging:
             self.log = logging
         else:
+            setup_logger(log, log)
             self.log = logging.getLogger(log)
         self.state = state
         self.users = users
