@@ -103,7 +103,8 @@ def equal_words(words, guesses):
     res = []
     for guess in guesses:
         #logging.debug(str(words[k][0]) + guess.decode("utf-8"))
-        if words[k][0] == guess.decode("utf-8"):
+        # .decode("utf-8")
+        if words[k][0] == guess:
             res.append(1)
         else:
             res.append(0)

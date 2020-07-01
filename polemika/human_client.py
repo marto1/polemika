@@ -79,8 +79,8 @@ class HumanPlayer(DummyAI):
     def process_guesses(self, data):
         k = 0
         for entry in data[0]:
-            WORDS[k]["trans"] = entry[0].decode("utf-8")
-            self.state.words[k]["trans"] = entry[0].decode("utf-8")
+            WORDS[k]["trans"] = entry[0]
+            self.state.words[k]["trans"] = entry[0]
             k += 1
         show_correct(WORDS)
         #show_correct(self.state.words)
@@ -150,6 +150,7 @@ def draw_text(message, pos, color=(255, 255, 255)):
 
 #horrible hacks/wrappers
 def draw_grid_image(s, pos, size, state):
+    size = (int(size[0]), int(size[1]))
     surface.blit(
         pygame.transform.scale(
             WORDS[state.selected_index]['pic'], size),

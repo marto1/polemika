@@ -22,7 +22,7 @@ class DummyAI(GameProtocol):
         lw = self.longest_word
         lp = self.letter_pool
         n = random.randint(1, lw)
-        res = ''.join(random.choice(lp) for _ in xrange(n))
+        res = ''.join(random.choice(lp) for _ in range(n))
         return res
 
     def process_ready(self, data):
