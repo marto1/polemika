@@ -133,11 +133,12 @@ class GameProtocol(LineReceiver):
 
 
     def lineReceived(self, line):
+        line = line.decode("utf-8")
         self.log.debug("RCVD::" + str(line))
         try:
             rdata = loads(line)
-        except Exception:
-            self.error(10, "Invalid syntax")
+        except Exception as e:
+            self.error(10, f"Invalid syntax {e} {line}")
         else:
             if len(rdata) == 0:
                 self.error(12, "Empty set")
@@ -194,7 +195,7 @@ class GameProtocol(LineReceiver):
             self.state.phase = "ready"
             self.broadcast(cmd.ready)
             self.broadcast(cmd.total_time, self.state.time)
-            self.broadcast(cmd.players, self.users.keys())
+            self.broadcast(cmd.players, list(self.users.keys()))
             self.state.comparison_words = tuple(tuple(x.values()) for x in self.state.words)
             #print(self.state.comparison_words)
             w = tuple((x[2], x[1]) for x in self.state.comparison_words)

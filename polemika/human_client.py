@@ -29,7 +29,7 @@ def convert_to_dict(words):
         else:
             p = prep_img("pics/black.jpg")
         res.append({
-            "word": word[0].decode("utf-8"),
+            "word": word[0],
             "pic": p,
             "trans": u"",
             "guess": u""})

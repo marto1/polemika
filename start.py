@@ -50,5 +50,5 @@ if __name__ == '__main__':
     start_server(2, 30, DICT, "server.log")
     sleep(0.5)
     start_smart_player('ai.log')
-    # start_human_player('human.log')
+    start_human_player('human.log')
     reactor.run()
