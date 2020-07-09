@@ -68,9 +68,9 @@ def process_line(line):
         img = raw[2]
     try:
         return {
-            "word" :  raw[1],
+            "word" :  raw[0],
             "pic"  :  img,
-            "trans":  raw[0],}
+            "trans":  raw[1],}
     except Exception as e:
         print(e)
         raise ValueError(u"Bad line:{0}".format(raw))
