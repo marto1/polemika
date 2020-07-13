@@ -28,7 +28,7 @@ class MomentAI(DummyAI):
 
     def add_to_blurry(self, word):
         if len(self.blurry_pool) >= self.max_blurry:
-            ch = choice(self.blurry_pool.keys())
+            ch = choice(list(self.blurry_pool.keys()))
             del self.blurry_pool[ch]
         self.blurry_pool[word] = {"trans": "", "count": 0}    
 
@@ -51,7 +51,7 @@ class MomentAI(DummyAI):
             if word in self.blurry_pool:
                 if self.blurry_pool[word]["count"] >= self.transfer_tresh:
                     if len(self.direct_pool) >= self.max_direct:
-                        ch = choice(self.direct_pool.keys())
+                        ch = choice(list(self.direct_pool.keys()))
                         del self.direct_pool[ch]
                     self.direct_pool[word] = entry[0]
                     del self.blurry_pool[word]
