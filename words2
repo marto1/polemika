@@ -287,7 +287,7 @@ forståelse,grasp
 forståelse,understanding
 forstyrre,bother
 forstyrret,interrupted
-forsvinder,disappears
+forsvind,disappear
 forsyningen,supply
 fortæller,narrator
 fortaler,advocate
@@ -597,7 +597,6 @@ nyttig,helpful
 ødelæggelse,destruction
 ødelagt,ruined
 offentliggøre,publish
-offer,sacrifice
 øget,increased
 øget,increasing
 omdirigeres,redirected
@@ -673,7 +672,6 @@ præge,mark/influence
 præstation,achievement
 praktisk,handy
 proklameret,proclaimed
-råbte,cried
 rådgivning,advising
 række,range(of)
 række,reach
@@ -956,7 +954,7 @@ udpege,appoint
 udsætter,postpone
 udsat,exposed
 udsatte,vulnerable
-udseende,looks
+udseende,looks/appearance
 udsigt,view
 udskiftes,replaced
 udstationer,post
@@ -1057,7 +1055,6 @@ indhold,content
 midten,middle
 afsnit,section
 bogført,posted
-behov,lines
 skal,shall
 bevidsthed,consciousness
 sang,song
@@ -1206,3 +1203,8 @@ skum,foam
 sån,such a
 nål,needle
 dengang,back then
+rosende,praise
+overfor,transfer
+frygtelige,terrible
+ofre,sacrifice
+råb,cry
