@@ -92,11 +92,11 @@ benævnte,named
 benyttede,used/took
 benyt,use
 berette,report
-berømte,famous
-berørte,touched
+berømt,famous
+berørt,touched
 beruset,drunk
 berygtet,notoriety/scandalous
-beskadiget,corrupted
+beskadiget,corrupted/damaged
 beskrev,described
 beskrivelse,description
 beskriver,describes
@@ -524,7 +524,7 @@ ligeglad,indifferent
 ligegyldigt,no matter what
 ligeledes,likewise
 ligesom,like(compare)
-ligger,lies(on smth)
+ligge,lie(on something)
 lind,steady
 løfte op,lift
 loftet,ceiling
@@ -970,13 +970,12 @@ ultimativt,ultimately
 umenneskeligheden,inhumanity
 umenneskelig,inhuman
 umodne,immature
-umulige,impossible
+umulig,impossible
 underholdende,entertaining
 underliggende,underlaying
 underordnede,menial
 underrette,inform
 underslæb,embezzlement
-understøttelse,support
 undertrykkeren,oppressor
 undertrykte,oppressed
 underviser,teach
@@ -994,7 +993,6 @@ uvidende,ignorant
 uvidende,oblivious
 vædde,bet
 vægelsindet,fickle
-væg,wall
 vækst,growth
 vældigt,mighty
 værdibevis,voucher
@@ -1108,7 +1106,6 @@ bøvl,trouble
 mellem,between
 sædvanligvis,usually
 undertiden,sometimes
-sjældent,rarely
 hemmelig,secret
 opbyg,build
 skak,chess
@@ -1241,7 +1238,7 @@ straks,immediately
 grib,vulture
 umådelig,immense
 adlyd,obey
-bøje,bend
+bøj,bend
 smitte,infection
 tillade,allow
 gravid,pregnant
@@ -1294,3 +1291,35 @@ våd,wet
 snavset,dirty
 ørken,desert
 kammerat,comrade
+gensyn,reunion
+forbedre,improve
+legetøj,toy
+spænde op,buckle up
+sky,cloud
+nå,reach
+hvil,rest
+pels,fur coat
+tålmodig,patient
+rat,steering wheel
+sjælden,rare
+det var det,thats it
+udstilling,exhibition
+tallerken,plate
+tavle,blackboard
+bænk,bench
+pude,pillow
+tæppe,blanket
+slapper af,relaxing
+nyre,kidney
+oprindelse,origin
+hvede,wheat
+næse,nose
+slåskamp,fist fight
+kælder,basement
+spejl,mirror
+kande,jug
+mur,wall
+væg,wall
+hvælv,vault
+støtte,support
+ordforråd,vocabulary
