@@ -48,7 +48,7 @@ ansvaret,responsibility
 ansvarlig,responsible
 antage,assume
 antallet,number
-antal,number
+antal,number(toll)
 anvendelse,application
 anvendt,used
 århundrede,century
@@ -1126,7 +1126,6 @@ frigive,release
 udbredte,widespread
 fremragende,excellent
 udslip,release
-lugt,smell
 forårsage,cause
 forandre,change
 frigivelse,release
@@ -1323,3 +1322,17 @@ væg,wall
 hvælv,vault
 støtte,support
 ordforråd,vocabulary
+lugt,smell
+høg,hawk
+oplader,charge
+omfavne,embrace
+embedsmand,official
+maddike,maggot
+håndtag,handle
+gebyr,fee
+fjern,remote/distant
+stilling,stand
+Det må du meget gerne,You are very welcome to do so
+sejt,cool
+fræk,cheeky/insolent
+forsigtig,careful
