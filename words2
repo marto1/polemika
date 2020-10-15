@@ -1,14 +1,13 @@
 åbenbart,obviously
-adskillige,sevelar
+adskillige,several
 advarsel,warning
 ægte,genuine
-ægte,real
 ængstelig,anxious
 ærbødighed,reverence
-ærmet,sleeve
+ærme,sleeve
 afbryde,interrupt
 afdeling,department
-afgørelsen,decision
+afgørelse,decision
 afgørende,essential
 afhænger,depends
 afsagt dom,judgment
@@ -21,7 +20,7 @@ afvigelse,deviation
 afviklet,settled
 afvise,reject
 afviste,rejected
-agn,bait
+lokkemad,bait
 agte,intend/mean
 aktindsigt,access
 aktiveret,enabled
@@ -35,9 +34,10 @@ analfabetisk,illiterate
 anbefaler,recommend
 anbefales,recommended
 anbragt,disposed
-anelser,fears
+anelse,suspicion
+frygt,fear
 angreb,attack
-anholdelsen,arrest
+anholdelse,arrest
 ankertov,anchor cable
 anklagede,accused
 anmeldelse,review
@@ -67,7 +67,7 @@ bagefter,afterwards
 bakspejlet,retrospect
 barndom,childhood
 bebrejde,blame
-bede,ask
+spørg,ask
 befolkning,population
 begået,committed
 begge,both
@@ -77,7 +77,7 @@ begreb,notion
 behageligt,pleasant
 behov,need/requirement
 bekendtskab,relation
-beklager,regrets
+beklage,regret
 bekostning,expense
 bekræft,confirm
 bekvemmelighed,convenience
@@ -114,7 +114,7 @@ betegnelse,term
 betingelser,conditions
 betingelsesløst,unconditionally
 betydelige,considerable
-betyde,meant
+betyde,mean
 betyder,means
 beundring,admiration
 bevægelse,movement
